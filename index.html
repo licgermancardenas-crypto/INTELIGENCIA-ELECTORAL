@@ -32,7 +32,11 @@
     --mono:'JetBrains Mono', monospace;
   }
 
-  html, body { background: var(--bg-0); color: var(--ink); overflow:hidden; }
+  html, body {
+    height: 100%; width: 100%; margin: 0; padding: 0;
+    background: var(--bg-0); color: var(--ink); overflow: hidden;
+  }
+  .reveal, .reveal .slides { height: 100% !important; }
 
   /* Persistent atmospheric grain layer */
   body::after{
@@ -1075,7 +1079,8 @@
     hash: true, controls: true, progress: true, center: false,
     slideNumber: 'c/t', transition: 'slide', transitionSpeed: 'default',
     backgroundTransition: 'fade',
-    width: 1440, height: 900, margin: 0.05,
+    width: 1920, height: 1080, margin: 0.04,
+    minScale: 0.2, maxScale: 2.0,
     pdfSeparateFragments: false, pdfMaxPagesPerSlide: 1,
   });
 
