@@ -221,28 +221,6 @@
   .titleblock h2{ margin: 0 0 .35em; }
   .titleblock .lead{ font-size: 1em; color: var(--ink-2); font-weight:300; }
 
-  /* ===== LAYERS DIAGRAM ===== */
-  .layers{ position:relative; height: 380px; cursor: default; }
-  .layers .layer{
-    position:absolute; left:50%; transform: translateX(-50%);
-    border:1px solid var(--line-strong); border-radius: 16px;
-    background: linear-gradient(180deg, rgba(139,92,246,.12), rgba(139,92,246,.02));
-    padding: .9em 1.5em;
-    font-family: var(--mono); font-size:.6em; letter-spacing:.24em; text-transform:uppercase; color: var(--ink);
-    backdrop-filter: blur(10px); cursor: pointer;
-    transition: transform .4s cubic-bezier(.2,.8,.2,1), border-color .4s, box-shadow .4s, background .4s;
-  }
-  .layers .layer:hover{
-    border-color: var(--gold); background: rgba(212,175,55,.12);
-    box-shadow: 0 0 40px var(--gold-glow), inset 0 0 20px rgba(212,175,55,.1);
-    transform: translateX(-50%) scale(1.04);
-  }
-  .layers .l1{ top: 0;    width: 56%; }
-  .layers .l2{ top: 72px;  width: 66%; }
-  .layers .l3{ top: 144px; width: 78%; }
-  .layers .l4{ top: 216px; width: 68%; }
-  .layers .l5{ top: 288px; width: 58%; }
-
   /* ===== BARS ===== */
   .bar{ position:relative; height:6px; border-radius:999px; background: rgba(255,255,255,.08); overflow:hidden; }
   .bar > span{
@@ -479,6 +457,71 @@
   /* compact lead */
   .lead-sm{ font-size:.85em; color: var(--ink-2); }
 
+  /* ===== NEURAL NETWORK (DNA-like lateral visual) ===== */
+  .nn-stage{
+    position:absolute; top: 50%; right: -14%; transform: translateY(-50%);
+    width: 62%; height: 118%;
+    z-index: 0; pointer-events: none;
+    display:flex; align-items:center; justify-content:center;
+    perspective: 1400px;
+  }
+  .nn-svg{
+    width: 100%; height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 0 80px rgba(139,92,246,.5));
+    transform: rotateY(-16deg) rotateX(4deg);
+    transform-style: preserve-3d;
+    animation: nnFloat 18s ease-in-out infinite;
+  }
+  @keyframes nnFloat{
+    0%, 100% { transform: rotateY(-18deg) rotateX(5deg) translateY(0); }
+    50%      { transform: rotateY(-8deg)  rotateX(-3deg) translateY(-10px); }
+  }
+  .nn-svg .nn-edge{
+    stroke: rgba(167,139,250,.18);
+    stroke-width: .55;
+    fill: none;
+  }
+  .nn-svg .nn-edge.bright{
+    stroke: rgba(196,181,253,.42);
+    stroke-width: .85;
+  }
+  .nn-svg .nn-node{
+    filter: drop-shadow(0 0 6px rgba(167,139,250,.75));
+  }
+  .nn-svg .nn-node-io{
+    filter: drop-shadow(0 0 14px rgba(244,210,138,.9));
+  }
+  .nn-svg .nn-signal{
+    stroke: #f4d28a;
+    stroke-width: 1.8;
+    fill: none;
+    stroke-linecap: round;
+    stroke-dasharray: 28 1600;
+    stroke-dashoffset: 1628;
+    filter: drop-shadow(0 0 8px rgba(244,210,138,.95));
+    animation: nnSignal 2.6s linear infinite;
+  }
+  @keyframes nnSignal{ to { stroke-dashoffset: 0; } }
+
+  .nn-text{
+    position: relative; z-index: 2;
+    max-width: 48%;
+  }
+  .nn-labels{
+    position:absolute; left: -2em; top:50%; transform: translateY(-50%);
+    display:flex; flex-direction:column; gap: 1.4em;
+    font-family: var(--mono); font-size:.5em; letter-spacing:.22em; text-transform:uppercase;
+    color: var(--gold-2);
+  }
+  .nn-labels span{
+    display:flex; align-items:center; gap:.6em;
+  }
+  .nn-labels span::before{
+    content:""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); box-shadow: 0 0 10px var(--gold);
+  }
+
   @media print { body::after, .hint { display:none; } }
 </style>
 </head>
@@ -706,32 +749,36 @@
       <div class="bg" style="background-image: url('assets/datacenter.png');"></div>
       <div class="veil right"></div>
 
-      <div class="grid g-2" style="grid-template-columns: 1fr 1fr; gap:3em; align-items:center;">
-        <div>
-          <div class="eyebrow">Metodología</div>
-          <h2>Cinco capas que se leen <em>juntas</em>.</h2>
-          <p class="lead-sm" style="margin: .8em 0 1.4em;">
-            Ninguna capa aislada explica una elección. Las superponemos en un mismo modelo, y aparecen los patrones que ningún consultor humano puede sostener simultáneamente.
-          </p>
-          <ul class="ticks">
-            <li><strong>Territorial</strong> — radios censales, conmutación, vías de circulación.</li>
-            <li><strong>Demográfica</strong> — edad, género, hogar, nivel educativo y socioeconómico.</li>
-            <li><strong>Psicosocial</strong> — valores, miedos, aspiraciones, identidad cultural.</li>
-            <li><strong>Digital</strong> — conversación, sentimiento, influenciadores locales.</li>
-            <li><strong>Histórica electoral</strong> — series por mesa y volatilidad de cohorte.</li>
-          </ul>
-          <p style="font-family: var(--mono); font-size:.55em; letter-spacing:.25em; color: var(--muted); margin-top: 1em;">▸ hovereá las capas →</p>
-        </div>
+      <div class="nn-stage">
+        <svg id="nn" class="nn-svg" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
 
-        <div>
-          <div class="layers">
-            <div class="layer l1">01 · Territorial</div>
-            <div class="layer l2">02 · Demográfica</div>
-            <div class="layer l3">03 · Psicosocial</div>
-            <div class="layer l4">04 · Digital</div>
-            <div class="layer l5">05 · Histórica electoral</div>
+      <div class="nn-text">
+        <div class="eyebrow">Metodología</div>
+        <h2>Cinco capas que se leen<br/><em>como una sola</em>.</h2>
+        <p class="lead-sm" style="margin: 1em 0 1.4em;">
+          Ninguna capa aislada explica una elección. Las superponemos en un modelo de inferencia que aprende patrones que ningún consultor humano puede sostener simultáneamente.
+        </p>
+        <ul class="ticks">
+          <li><strong>Territorial</strong> — radios censales, conmutación, vías de circulación.</li>
+          <li><strong>Demográfica</strong> — edad, género, hogar, nivel educativo y socioeconómico.</li>
+          <li><strong>Psicosocial</strong> — valores, miedos, aspiraciones, identidad cultural.</li>
+          <li><strong>Digital</strong> — conversación, sentimiento, influenciadores locales.</li>
+          <li><strong>Histórica electoral</strong> — series por mesa y volatilidad de cohorte.</li>
+        </ul>
+        <div style="display:flex; gap: 2em; margin-top: 1.6em; padding-top: 1.2em; border-top: 1px solid var(--line);">
+          <div>
+            <div style="font-family: var(--serif); font-size: 2.2em; font-weight:500; line-height:1; background: linear-gradient(180deg,#fff,var(--violet-2)); -webkit-background-clip:text; background-clip:text; color:transparent;">5</div>
+            <span style="font-family: var(--mono); font-size:.5em; letter-spacing:.2em; text-transform:uppercase; color: var(--ink-2);">Capas de entrada</span>
           </div>
-          <p style="text-align:center; font-family: var(--mono); font-size:.55em; letter-spacing:.25em; color: var(--muted); margin-top: .8em;">SISTEMA INTEGRADO · 5 CAPAS</p>
+          <div>
+            <div style="font-family: var(--serif); font-size: 2.2em; font-weight:500; line-height:1; background: linear-gradient(180deg,#fff,var(--gold-2),var(--gold)); -webkit-background-clip:text; background-clip:text; color:transparent;">3</div>
+            <span style="font-family: var(--mono); font-size:.5em; letter-spacing:.2em; text-transform:uppercase; color: var(--ink-2);">Capas de inferencia</span>
+          </div>
+          <div>
+            <div style="font-family: var(--serif); font-size: 2.2em; font-weight:500; line-height:1; background: linear-gradient(180deg,#fff,var(--violet-2)); -webkit-background-clip:text; background-clip:text; color:transparent;">1</div>
+            <span style="font-family: var(--mono); font-size:.5em; letter-spacing:.2em; text-transform:uppercase; color: var(--ink-2);">Decisión accionable</span>
+          </div>
         </div>
       </div>
       <div class="pagefoot"><span>05 — Metodología</span><span class="sep"></span><span>06 / 13</span></div>
@@ -933,7 +980,7 @@
 
     <!-- ========== 10. APLICACIONES ========== -->
     <section data-transition="slide">
-      <div class="bg" style="background-image: url('assets/charts-wide.png');"></div>
+      <div class="bg" style="background-image: url('assets/war-room.jpg'); filter: saturate(.7) hue-rotate(220deg) brightness(.85);"></div>
       <div class="veil"></div>
 
       <div class="eyebrow">Aplicaciones</div>
@@ -1184,6 +1231,99 @@
       if(!wasOpen){ s.classList.add('open'); s.querySelector('.seg-more').textContent='—'; }
     });
   });
+
+  // ---- Build neural network SVG (Metodología slide) ----
+  (function(){
+    var svg = document.getElementById('nn'); if(!svg) return;
+    var W = 600, H = 920;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+    var layers = [5, 9, 11, 8, 3];
+    var n = layers.length;
+    var mX = 60, mY = 70;
+    var sX = (W - 2*mX) / (n - 1);
+
+    var nodes = [];
+    layers.forEach(function(count, li){
+      var x = mX + li * sX;
+      var sY = (H - 2*mY) / (count + 1);
+      for(var i=0;i<count;i++){
+        nodes.push({ x:x, y: mY + sY*(i+1), layer:li, io:(li===0 || li===n-1) });
+      }
+    });
+    var byLayer = layers.map(function(_, li){
+      return nodes.filter(function(nd){ return nd.layer===li; });
+    });
+
+    // edges
+    var edges = [];
+    for(var li=0; li<n-1; li++){
+      byLayer[li].forEach(function(a){
+        byLayer[li+1].forEach(function(b){
+          var mx = (a.x + b.x) / 2;
+          var d = 'M'+a.x+','+a.y+' C'+mx+','+a.y+' '+mx+','+b.y+' '+b.x+','+b.y;
+          edges.push({ d:d, bright: Math.random() < 0.14 });
+        });
+      });
+    }
+
+    // signal flows: input → output through random midnodes
+    var signals = [];
+    for(var s=0; s<7; s++){
+      var path = '';
+      var prev = null;
+      for(var li=0; li<n; li++){
+        var pool = byLayer[li];
+        var pick = pool[(Math.random()*pool.length)|0];
+        if(prev){
+          var mx = (prev.x + pick.x)/2;
+          path += ' C'+mx+','+prev.y+' '+mx+','+pick.y+' '+pick.x+','+pick.y;
+        } else {
+          path = 'M'+pick.x+','+pick.y;
+        }
+        prev = pick;
+      }
+      signals.push({
+        d: path,
+        delay: (s * 0.42).toFixed(2),
+        dur: (2.4 + s * 0.22).toFixed(2)
+      });
+    }
+
+    var html =
+      '<defs>'+
+        '<radialGradient id="ngHidden" cx="40%" cy="40%">'+
+          '<stop offset="0%" stop-color="#fff" stop-opacity=".95"/>'+
+          '<stop offset="35%" stop-color="#a78bfa" stop-opacity=".95"/>'+
+          '<stop offset="100%" stop-color="#4c1d95" stop-opacity=".5"/>'+
+        '</radialGradient>'+
+        '<radialGradient id="ngIO" cx="40%" cy="40%">'+
+          '<stop offset="0%" stop-color="#fff" stop-opacity="1"/>'+
+          '<stop offset="40%" stop-color="#f4d28a" stop-opacity=".95"/>'+
+          '<stop offset="100%" stop-color="#92670d" stop-opacity=".55"/>'+
+        '</radialGradient>'+
+      '</defs>';
+
+    var edgeHtml = edges.map(function(e){
+      return '<path d="'+e.d+'" class="nn-edge'+(e.bright?' bright':'')+'"/>';
+    }).join('');
+    html += '<g class="nn-edges">'+edgeHtml+'</g>';
+
+    var sigHtml = signals.map(function(sg){
+      return '<path d="'+sg.d+'" class="nn-signal" style="animation-delay:'+sg.delay+'s;animation-duration:'+sg.dur+'s;"/>';
+    }).join('');
+    html += '<g class="nn-signals">'+sigHtml+'</g>';
+
+    var nodeHtml = nodes.map(function(nd){
+      var r = nd.io ? 9 : 7;
+      var cls = nd.io ? 'nn-node nn-node-io' : 'nn-node';
+      var fill = nd.io ? 'url(#ngIO)' : 'url(#ngHidden)';
+      return '<circle cx="'+nd.x+'" cy="'+nd.y+'" r="'+r+'" class="'+cls+'" fill="'+fill+'"/>';
+    }).join('');
+    html += '<g class="nn-nodes">'+nodeHtml+'</g>';
+
+    svg.innerHTML = html;
+  })();
 
   // ---- Live ticker on cover ----
   (function(){
