@@ -607,17 +607,66 @@
     opacity: 0; animation: introFade 1.4s ease 0.6s forwards;
     text-shadow: 0 0 20px rgba(167,139,250,.6);
   }
-  .atlas-intro-title{
-    font-family: var(--serif); font-weight: 400;
-    font-size: clamp(2.4em, 5.5vw, 5.8em);
-    line-height: 1; letter-spacing: .04em; text-transform: uppercase;
-    background: linear-gradient(180deg, #ffffff 0%, #f4d28a 60%, #d4af37 100%);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    margin: 0;
+  /* Logo stage: halo + rotor + image */
+  .intro-logo-stage{
+    position: relative;
+    width: clamp(360px, 56vh, 640px);
+    aspect-ratio: 1 / 1;
+    margin: .3em 0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .intro-halo{
+    position:absolute; inset: -22%;
+    border-radius: 50%;
+    background: radial-gradient(circle at center,
+      rgba(208,64,255,.55) 0%,
+      rgba(160,32,240,.30) 26%,
+      rgba(139,92,246,.12) 48%,
+      transparent 70%);
+    filter: blur(28px);
+    z-index: 0; pointer-events: none;
+    animation: haloPulse 4.8s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+  .intro-halo.outer{
+    inset: -42%;
+    background: radial-gradient(circle at center,
+      rgba(196,100,255,.20) 0%,
+      rgba(139,92,246,.10) 32%,
+      transparent 68%);
+    filter: blur(54px);
+    animation: haloPulse 6.4s ease-in-out infinite reverse;
+  }
+  @keyframes haloPulse{
+    0%, 100% { transform: scale(1);    opacity: .72; }
+    50%      { transform: scale(1.12); opacity: 1.0; }
+  }
+  .intro-logo-rotor{
+    position: relative; width: 100%; height: 100%; z-index: 1;
+    animation: logoRotate 60s linear infinite;
+    will-change: transform;
+  }
+  @keyframes logoRotate{
+    to { transform: rotate(360deg); }
+  }
+  .intro-logo{
+    display: block; width: 100%; height: 100%;
+    object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;
     opacity: 0;
-    animation: introTitle 2.4s cubic-bezier(.2,.7,.2,1) 1.0s forwards;
-    text-shadow: none;
-    filter: drop-shadow(0 0 30px rgba(212,175,55,.35));
+    user-select: none; -webkit-user-drag: none;
+    animation:
+      logoEntrance 1.8s cubic-bezier(.2,.7,.2,1) 0.4s forwards,
+      logoFloat 7s ease-in-out 2.2s infinite;
+    will-change: transform, opacity;
+  }
+  @keyframes logoEntrance{
+    0%   { opacity: 0; transform: translateY(18px) scale(.94); }
+    100% { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+  @keyframes logoFloat{
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
   }
   .atlas-intro-tag{
     font-family: var(--serif); font-style: italic; font-weight: 300;
@@ -668,10 +717,6 @@
     opacity: 0; animation: introFade 1s ease 3.6s forwards;
   }
 
-  @keyframes introTitle{
-    0%   { opacity: 0; transform: translateY(18px); letter-spacing: .14em; }
-    100% { opacity: 1; transform: translateY(0);    letter-spacing: .04em; }
-  }
   @keyframes introFade{ to { opacity: 1; } }
   @keyframes loaderSweep{
     0%   { left: -45%; }
@@ -683,20 +728,28 @@
 </head>
 <body>
 
-<!-- ===== 3D INTRO OVERLAY ===== -->
+<!-- ===== ATLAS INTRO OVERLAY ===== -->
 <div id="atlas-intro" class="atlas-intro" aria-label="Pantalla de bienvenida Atlas Analytics">
-  <canvas id="globe-canvas" aria-hidden="true"></canvas>
+  <canvas id="intro-particles" aria-hidden="true"></canvas>
   <div class="grid-mask"></div>
   <div class="vignette"></div>
   <div class="atlas-intro-ui">
-    <div class="atlas-intro-sub">Inteligencia Electoral</div>
-    <h1 class="atlas-intro-title">Atlas Analytics</h1>
+    <div class="atlas-intro-sub">Inteligencia Electoral · 2026 / 2027</div>
+
+    <div class="intro-logo-stage">
+      <div class="intro-halo outer"></div>
+      <div class="intro-halo"></div>
+      <div class="intro-logo-rotor">
+        <img class="intro-logo" src="assets/logo-globe.png" alt="Atlas Analytics" draggable="false" />
+      </div>
+    </div>
+
     <div class="atlas-intro-tag">Ganar elecciones en la <em style="color: var(--gold-2);">era del dato</em>.</div>
     <div class="atlas-intro-loader" role="status" aria-label="Cargando"><span></span></div>
     <button class="atlas-intro-btn" id="atlas-enter" type="button">
       <span class="dot"></span> Entrar a la experiencia
     </button>
-    <div class="atlas-intro-hint">Auto-inicio en breve · o hacé clic para entrar</div>
+    <div class="atlas-intro-hint">o presioná Enter / Espacio</div>
   </div>
 </div>
 
@@ -1532,332 +1585,135 @@
   })();
 </script>
 
-<!-- ===== THREE.JS 3D INTRO (importmap + ES modules) ===== -->
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
-<script type="module">
-import * as THREE from 'three';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-
+<!-- ===== ATLAS INTRO (logo image + canvas particles + CSS effects) ===== -->
+<script>
 (function(){
-  const canvas = document.getElementById('globe-canvas');
+  const canvas = document.getElementById('intro-particles');
   const intro  = document.getElementById('atlas-intro');
   const enterBtn = document.getElementById('atlas-enter');
   if (!canvas || !intro) return;
 
-  let renderer, scene, camera, composer, bloomPass;
-  let globe, wireframe, plexusPoints, plexusLines;
-  let plexusData;
-  let running = true;
-  let raf = 0;
-  const clock = new THREE.Clock();
+  const ctx = canvas.getContext('2d', { alpha: true });
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 0, H = 0, raf = 0, running = true;
+  const particles = [];
 
-  // ---------- Setup ----------
+  function size(){
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width  = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
   function init(){
-    const w = window.innerWidth, h = window.innerHeight;
-
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(w, h, false);
-    renderer.setClearColor(0x000000, 0);
-
-    scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0a0820, 0.07);
-
-    camera = new THREE.PerspectiveCamera(42, w/h, 0.1, 100);
-    camera.position.set(0, 0.05, 4.0);
-    camera.lookAt(0, 0, 0);
-
-    // Subtle group tilt for depth feel
-    const root = new THREE.Group();
-    root.rotation.x = 0.16; // slight equator tilt
-    scene.add(root);
-
-    globe = createGlobePoints();
-    root.add(globe);
-
-    wireframe = createWireframe();
-    root.add(wireframe);
-
-    const plex = createPlexus();
-    plexusPoints = plex.points;
-    plexusLines  = plex.lines;
-    plexusData   = plex.data;
-    root.add(plexusPoints);
-    root.add(plexusLines);
-
-    // Postprocessing — bloom for the neon look
-    composer = new EffectComposer(renderer);
-    composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    composer.setSize(w, h);
-    composer.addPass(new RenderPass(scene, camera));
-    bloomPass = new UnrealBloomPass(new THREE.Vector2(w, h), 0.95, 0.65, 0.12);
-    composer.addPass(bloomPass);
-    composer.addPass(new OutputPass());
-
-    window.addEventListener('resize', onResize);
-  }
-
-  // ---------- Globe: lat/lng point cloud + procedural continent mask ----------
-  function continentNoise(x, y, z){
-    // Layered sines — gives organic "continent" patches
-    return (
-      Math.sin(x*2.3 + y*1.7 + 0.8) +
-      Math.sin(y*2.7 + z*1.4 - 0.3) +
-      Math.sin(z*2.1 + x*1.9 + 1.6) +
-      Math.sin(x*4.1) * 0.5 +
-      Math.sin(y*3.8 - 0.5) * 0.5
-    ) / 4.0;
-  }
-
-  function createGlobePoints(){
-    const radius = 1.5;
-    const positions = [], colors = [], baseAlpha = [];
-
-    for (let lat = -88; lat <= 88; lat += 3){
-      const phi = (90 - lat) * Math.PI / 180;
-      const cosLat = Math.cos(lat * Math.PI / 180);
-      const lngSteps = Math.max(12, Math.round(110 * cosLat));
-      for (let i = 0; i < lngSteps; i++){
-        const jitter = (Math.random() - 0.5) * 1.4;
-        const lng = (i / lngSteps) * 360 + jitter;
-        const theta = lng * Math.PI / 180;
-        const x = radius * Math.sin(phi) * Math.cos(theta);
-        const y = radius * Math.cos(phi);
-        const z = radius * Math.sin(phi) * Math.sin(theta);
-
-        const n = continentNoise(x, y, z);
-        // "land" if n > 0.18
-        const isLand = n > 0.18;
-
-        positions.push(x, y, z);
-
-        if (isLand){
-          // Bright magenta/violet
-          colors.push(0.82, 0.18, 0.96);   // #d12cf5-ish
-        } else {
-          // Dim violet for ocean
-          colors.push(0.40, 0.10, 0.62);   // #6618a0
-        }
-        baseAlpha.push(isLand ? 1.0 : 0.35);
-      }
-    }
-
-    const geom = new THREE.BufferGeometry();
-    geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geom.setAttribute('color',    new THREE.Float32BufferAttribute(colors, 3));
-
-    const mat = new THREE.PointsMaterial({
-      size: 0.022,
-      sizeAttenuation: true,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.95,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-    return new THREE.Points(geom, mat);
-  }
-
-  // ---------- Wireframe envelope ----------
-  function createWireframe(){
-    const sphereGeom = new THREE.SphereGeometry(1.54, 30, 22);
-    const wireGeom = new THREE.WireframeGeometry(sphereGeom);
-    const mat = new THREE.LineBasicMaterial({
-      color: 0xa020f0,
-      transparent: true,
-      opacity: 0.16,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-    return new THREE.LineSegments(wireGeom, mat);
-  }
-
-  // ---------- Plexus: shell of particles + dynamic close-neighbor lines ----------
-  function createPlexus(){
-    const N = 140;
-    const positions = new Float32Array(N * 3);
-    const velocities = new Float32Array(N * 3);
-    const data = { N, positions, velocities };
-
+    size();
+    particles.length = 0;
+    const N = Math.max(45, Math.min(130, Math.round((W * H) / 18000)));
     for (let i = 0; i < N; i++){
-      const r = 1.95 + Math.random() * 0.55;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
-      positions[i*3+1] = r * Math.cos(phi);
-      positions[i*3+2] = r * Math.sin(phi) * Math.sin(theta);
-      velocities[i*3]   = (Math.random()-0.5) * 0.0015;
-      velocities[i*3+1] = (Math.random()-0.5) * 0.0015;
-      velocities[i*3+2] = (Math.random()-0.5) * 0.0015;
+      // Cluster bias: 70% spread across viewport, 30% closer to center
+      let x, y;
+      if (Math.random() < 0.3){
+        // Around the logo (center area)
+        const cx = W * 0.5, cy = H * 0.5;
+        const angle = Math.random() * Math.PI * 2;
+        const dist  = Math.min(W, H) * (0.18 + Math.random() * 0.18);
+        x = cx + Math.cos(angle) * dist;
+        y = cy + Math.sin(angle) * dist;
+      } else {
+        x = Math.random() * W;
+        y = Math.random() * H;
+      }
+      particles.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 0.28,
+        vy: (Math.random() - 0.5) * 0.28,
+        r:  0.4 + Math.random() * 1.5,
+        pulse:  Math.random() * Math.PI * 2,
+        pSpeed: 0.014 + Math.random() * 0.035,
+        isGold: Math.random() < 0.22
+      });
     }
-
-    const pGeom = new THREE.BufferGeometry();
-    pGeom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    const pMat = new THREE.PointsMaterial({
-      color: 0xe060ff,
-      size: 0.045,
-      transparent: true,
-      opacity: 0.9,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-    const points = new THREE.Points(pGeom, pMat);
-
-    // Dynamic lines geometry
-    const maxLines = N * 8;
-    const lineGeom = new THREE.BufferGeometry();
-    const linePositions = new Float32Array(maxLines * 2 * 3);
-    lineGeom.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
-    lineGeom.setDrawRange(0, 0);
-    const lineMat = new THREE.LineBasicMaterial({
-      color: 0xa020f0,
-      transparent: true,
-      opacity: 0.42,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-    const lines = new THREE.LineSegments(lineGeom, lineMat);
-    data.maxLines = maxLines;
-
-    return { points, lines, data };
   }
 
-  function updatePlexus(){
-    const { N, positions, velocities, maxLines } = plexusData;
-    // Move particles
-    for (let i = 0; i < N; i++){
-      const ix = i*3;
-      positions[ix]   += velocities[ix];
-      positions[ix+1] += velocities[ix+1];
-      positions[ix+2] += velocities[ix+2];
-      const x = positions[ix], y = positions[ix+1], z = positions[ix+2];
-      const r = Math.sqrt(x*x + y*y + z*z);
-      if (r < 1.85 || r > 2.65){
-        velocities[ix]   = -velocities[ix];
-        velocities[ix+1] = -velocities[ix+1];
-        velocities[ix+2] = -velocities[ix+2];
-      }
-    }
-    plexusPoints.geometry.attributes.position.needsUpdate = true;
-
-    // Recompute lines for nearby pairs
-    const linePos = plexusLines.geometry.attributes.position.array;
-    const maxDist = 0.55, maxDistSq = maxDist * maxDist;
-    let count = 0;
-    for (let i = 0; i < N; i++){
-      const ix = i*3;
-      const ax = positions[ix], ay = positions[ix+1], az = positions[ix+2];
-      for (let j = i+1; j < N; j++){
-        const jx = j*3;
-        const dx = ax - positions[jx];
-        const dy = ay - positions[jx+1];
-        const dz = az - positions[jx+2];
-        const dsq = dx*dx + dy*dy + dz*dz;
-        if (dsq < maxDistSq && count < maxLines){
-          const b = count*6;
-          linePos[b]   = ax; linePos[b+1] = ay; linePos[b+2] = az;
-          linePos[b+3] = positions[jx];
-          linePos[b+4] = positions[jx+1];
-          linePos[b+5] = positions[jx+2];
-          count++;
-        }
-      }
-    }
-    plexusLines.geometry.setDrawRange(0, count * 2);
-    plexusLines.geometry.attributes.position.needsUpdate = true;
-  }
-
-  // ---------- Animate ----------
-  function animate(){
+  function frame(){
     if (!running) return;
-    raf = requestAnimationFrame(animate);
-    const dt = Math.min(0.05, clock.getDelta());
+    raf = requestAnimationFrame(frame);
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
 
-    // Continuous slow Y rotation
-    globe.rotation.y     += dt * 0.10;
-    wireframe.rotation.y += dt * 0.10;
-    plexusPoints.rotation.y += dt * 0.04;
-    plexusLines.rotation.y  += dt * 0.04;
+    for (let i = 0; i < particles.length; i++){
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+      p.pulse += p.pSpeed;
+      if (p.x < -8)        p.x = W + 8;
+      else if (p.x > W + 8) p.x = -8;
+      if (p.y < -8)        p.y = H + 8;
+      else if (p.y > H + 8) p.y = -8;
 
-    // Subtle "twinkle" via global opacity sine
-    const t = clock.elapsedTime;
-    globe.material.opacity     = 0.85 + Math.sin(t * 1.2) * 0.06;
-    plexusPoints.material.opacity = 0.78 + Math.sin(t * 1.7 + 1.0) * 0.12;
-    plexusLines.material.opacity  = 0.38 + Math.sin(t * 1.4) * 0.08;
+      const a = 0.22 + 0.65 * (Math.sin(p.pulse) + 1) * 0.5;
 
-    updatePlexus();
-    composer.render(dt);
+      // Soft halo
+      ctx.fillStyle = p.isGold
+        ? 'rgba(244,210,138,' + (a * 0.18).toFixed(3) + ')'
+        : 'rgba(192,100,255,' + (a * 0.20).toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * 5.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bright core
+      ctx.fillStyle = p.isGold
+        ? 'rgba(248,225,170,' + a.toFixed(3) + ')'
+        : 'rgba(220,180,255,' + a.toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
-  function onResize(){
-    if (!running) return;
-    const w = window.innerWidth, h = window.innerHeight;
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
-    composer.setSize(w, h);
-    bloomPass.setSize(w, h);
+  function start(){ if (!raf) raf = requestAnimationFrame(frame); }
+  function stop(){
+    running = false;
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
   }
+
+  init();
+  start();
+
+  let resizeT = 0;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeT);
+    resizeT = setTimeout(function(){ if (running) init(); }, 120);
+  }, { passive: true });
 
   // ---------- Enter the deck ----------
   function enterExperience(){
-    if (!running) return;
-    // Camera zoom in
-    const startZ = camera.position.z;
-    const targetZ = 1.3;
-    const dur = 1500;
-    const start = performance.now();
-    function zoom(t){
-      const p = Math.min(1, (t - start) / dur);
-      const e = 1 - Math.pow(1 - p, 3);
-      camera.position.z = startZ - (startZ - targetZ) * e;
-      bloomPass.strength = 0.95 + e * 0.8;
-      if (p < 1 && running) requestAnimationFrame(zoom);
-    }
-    requestAnimationFrame(zoom);
-
-    // Fade UI then overlay
+    if (!running && intro.classList.contains('hide')) return;
     intro.classList.add('hide');
-
-    // Stop loop + dispose after fade
-    setTimeout(() => {
-      running = false;
-      if (raf) cancelAnimationFrame(raf);
+    setTimeout(function(){
+      stop();
       intro.style.display = 'none';
-      // Free GPU memory
-      try {
-        globe.geometry.dispose(); globe.material.dispose();
-        wireframe.geometry.dispose(); wireframe.material.dispose();
-        plexusPoints.geometry.dispose(); plexusPoints.material.dispose();
-        plexusLines.geometry.dispose();  plexusLines.material.dispose();
-        composer.passes.forEach(p => { if (p.dispose) p.dispose(); });
-        renderer.dispose();
-      } catch(e){ /* ignore */ }
-    }, 1800);
+    }, 1500);
   }
 
   enterBtn.addEventListener('click', enterExperience);
-  // ESC or Enter key shortcut
   document.addEventListener('keydown', function(e){
     if (intro.classList.contains('hide')) return;
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape'){
+      e.preventDefault();
       enterExperience();
     }
   });
 
-  init();
-  animate();
+  // Pause when tab hidden (perf)
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden) stop();
+    else if (!intro.classList.contains('hide')) { running = true; start(); }
+  });
 })();
 </script>
+
 </body>
 </html>
