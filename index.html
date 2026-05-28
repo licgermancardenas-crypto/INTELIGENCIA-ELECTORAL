@@ -32,11 +32,13 @@
     --mono:'JetBrains Mono', monospace;
   }
 
+  html { font-size: clamp(13px, 1.05vw, 22px); }
   html, body {
     height: 100%; width: 100%; margin: 0; padding: 0;
     background: var(--bg-0); color: var(--ink); overflow: hidden;
   }
-  .reveal, .reveal .slides { height: 100% !important; }
+  .reveal, .reveal .slides { height: 100% !important; width: 100% !important; }
+  .reveal .slides > section { height: 100% !important; width: 100% !important; }
 
   /* Persistent atmospheric grain layer */
   body::after{
@@ -1079,9 +1081,22 @@
     hash: true, controls: true, progress: true, center: false,
     slideNumber: 'c/t', transition: 'slide', transitionSpeed: 'default',
     backgroundTransition: 'fade',
-    width: 1920, height: 1080, margin: 0.04,
-    minScale: 0.2, maxScale: 2.0,
+    // Use actual viewport so reveal never letterboxes
+    width: window.innerWidth,
+    height: window.innerHeight,
+    margin: 0,
+    minScale: 1, maxScale: 1,
     pdfSeparateFragments: false, pdfMaxPagesPerSlide: 1,
+  });
+
+  // Reflow on resize so it fills the window when user resizes / toggles fullscreen
+  var _resizeT;
+  window.addEventListener('resize', function(){
+    clearTimeout(_resizeT);
+    _resizeT = setTimeout(function(){
+      Reveal.configure({ width: window.innerWidth, height: window.innerHeight });
+      Reveal.layout();
+    }, 120);
   });
 
   // ---- Heatmap procedural with hover tooltip via title ----
