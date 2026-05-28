@@ -388,69 +388,103 @@
   }
   .seg.open .seg-more{ color: var(--gold-2); border-color: rgba(212,175,55,.6); background: rgba(212,175,55,.08); }
 
-  /* ===== COVER STAGE (rotating planet + static logo) ===== */
+  /* ===== COVER STAGE (fullscreen planet + centerpiece logo) ===== */
   .cover-stage{
-    position:absolute; top: 50%; right: 4%; transform: translateY(-50%);
-    width: clamp(420px, 42vw, 700px); aspect-ratio: 1/1;
-    z-index: 0; pointer-events: none;
+    position:absolute; inset: 0;
+    display:flex; align-items:center; justify-content:center;
+    z-index: 0; pointer-events: none; overflow: hidden;
   }
-  /* Static halo behind the planet (no filter cost) */
+  /* Soft ambient halo behind everything (static, paint once) */
   .cover-stage::before{
-    content:""; position:absolute; inset: -8%; border-radius:50%;
-    background: radial-gradient(circle at center, rgba(167,139,250,.45) 0%, rgba(139,92,246,.18) 35%, transparent 65%);
-    z-index: -1;
+    content:""; position:absolute; top:50%; left:50%;
+    width: 130vh; height: 130vh; margin: -65vh 0 0 -65vh;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(167,139,250,.42) 0%, rgba(139,92,246,.16) 30%, transparent 62%);
+    z-index: 0;
   }
 
-  /* Rotating planet — circular mask, behind everything */
-  .planet{
-    position:absolute; inset: 4%; border-radius: 50%;
+  /* Rotating plexus background — covers full viewport */
+  .planet-bg{
+    position:absolute; top:50%; left:50%;
+    width: 140vmax; height: 140vmax; margin: -70vmax 0 0 -70vmax;
     background-image: url("assets/globe-plexus.png");
-    background-size: 180% 180%;
-    background-position: center;
-    animation: spinPlanet 45s linear infinite;
-    filter: hue-rotate(-5deg) saturate(1.25) brightness(1.05);
-    mask-image: radial-gradient(circle at center, black 58%, transparent 78%);
-    -webkit-mask-image: radial-gradient(circle at center, black 58%, transparent 78%);
-    opacity: .85;
+    background-size: cover; background-position: center;
+    animation: spinPlanet 90s linear infinite;
+    filter: hue-rotate(-5deg) saturate(1.35) brightness(1.1);
+    mask-image: radial-gradient(circle at center, black 32%, transparent 65%);
+    -webkit-mask-image: radial-gradient(circle at center, black 32%, transparent 65%);
+    opacity: .55;
     will-change: transform;
+    z-index: 0;
   }
-  /* Inner core glow that pulses */
+
+  /* Centered scene for the static logo + orbits */
+  .scene{ position:relative; width: 95vh; height: 95vh; z-index: 1; }
+
+  /* Inner core glow that pulses (small element, OK to filter) */
   .planet-core{
-    position:absolute; inset: 22%; border-radius:50%;
-    background: radial-gradient(circle at 40% 40%, rgba(196,181,253,.55) 0%, rgba(139,92,246,.25) 35%, transparent 65%);
+    position:absolute; top: 25%; left: 25%; width: 50%; height: 50%;
+    border-radius:50%;
+    background: radial-gradient(circle at 40% 40%, rgba(196,181,253,.6) 0%, rgba(139,92,246,.28) 35%, transparent 65%);
     filter: blur(8px);
-    animation: pulseCore 4.5s ease-in-out infinite;
+    animation: pulseCore 5s ease-in-out infinite;
     mix-blend-mode: screen;
+    pointer-events: none;
   }
   @keyframes pulseCore{ 0%,100%{ transform: scale(1); opacity:.7;} 50%{ transform: scale(1.08); opacity:1;} }
 
-  /* Orbit rings — two SVGs counter-rotating */
+  /* Orbit rings — counter-rotating */
   .orbit{
-    position:absolute; inset: 0;
-    pointer-events: none;
+    position:absolute; inset: -4%;
+    pointer-events: none; will-change: transform;
   }
   .orbit svg{ width:100%; height:100%; overflow:visible; }
   .orbit.a{ animation: spinOrbit 60s linear infinite; }
-  .orbit.b{ animation: spinOrbit 90s linear infinite reverse; transform: rotate(20deg); }
-  .orbit.c{ animation: spinOrbit 120s linear infinite; transform: rotate(-35deg); }
+  .orbit.b{ animation: spinOrbit 90s linear infinite reverse; }
+  .orbit.c{ animation: spinOrbit 120s linear infinite; }
   @keyframes spinOrbit{ to{ transform: rotate(360deg);} }
 
-  /* Static logo mark on top */
+  /* Static logo centerpiece */
   .mark{
-    position:absolute; inset: 0;
+    position:absolute; inset: 4%;
     background-image: url("assets/logo-globe.png");
-    background-size: 78% 78%;
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    filter: drop-shadow(0 0 60px rgba(196,181,253,.5));
-    animation: floatLogo 7s ease-in-out infinite;
-    mix-blend-mode: screen;
+    animation: floatLogo 8s ease-in-out infinite;
+    z-index: 2; will-change: transform;
   }
   @keyframes floatLogo{
-    0%,100%{ transform: translateY(0) rotate(-.5deg);}
-    50%{ transform: translateY(-12px) rotate(.6deg);}
+    0%,100%{ transform: translate3d(0,0,0) rotate(-.4deg);}
+    50%   { transform: translate3d(0,-10px,0) rotate(.5deg);}
   }
   @keyframes spinPlanet{ to{ transform: rotate(360deg);} }
+
+  /* ===== COVER TEXT OVERLAY (corners) ===== */
+  .cover-text{
+    position:absolute; inset: 0;
+    display:grid; grid-template-rows: auto 1fr auto;
+    padding: 3em 3.5em; pointer-events: auto;
+    z-index: 3;
+  }
+  .cover-top{ display:flex; justify-content:space-between; align-items:flex-start; }
+  .cover-bottom{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap: 2em;
+  }
+  .cover-bottom .title-block{ max-width: 28em; }
+  .cover-bottom h1{
+    font-size: clamp(2em, 3.6vw, 3.6em); line-height: 1.05;
+    margin: .25em 0 .35em; text-shadow: 0 6px 30px rgba(6,5,13,.8);
+  }
+  .cover-bottom .lead{
+    font-size: .95em; color: var(--ink); max-width: 26em;
+    text-shadow: 0 2px 14px rgba(6,5,13,.85);
+  }
+  .cover-bottom .meta{
+    display:flex; flex-direction:column; align-items:flex-end; gap:.5em;
+    text-shadow: 0 2px 10px rgba(6,5,13,.85);
+  }
 
   .reveal .slides section, .reveal .slides section > section { text-transform: none; }
 
@@ -542,9 +576,48 @@
 
     <!-- ========== 1. COVER ========== -->
     <section data-transition="fade">
-      <div class="bg" style="background-image: url('assets/plexus-abstract.png'); background-position: right center;"></div>
-      <div class="veil left"></div>
-      <div class="grid-overlay"></div>
+      <div class="cover-stage">
+        <div class="planet-bg"></div>
+
+        <div class="scene">
+          <div class="planet-core"></div>
+          <div class="orbit a">
+            <svg viewBox="-100 -100 200 200">
+              <defs>
+                <linearGradient id="og1" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#d4af37" stop-opacity="0"/>
+                  <stop offset="50%" stop-color="#d4af37" stop-opacity=".9"/>
+                  <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <ellipse cx="0" cy="0" rx="92" ry="92" fill="none" stroke="url(#og1)" stroke-width=".6" stroke-dasharray="2 4"/>
+              <circle cx="92" cy="0" r="2.2" fill="#f4d28a"/>
+              <circle cx="-92" cy="0" r="1.6" fill="#a78bfa"/>
+            </svg>
+          </div>
+          <div class="orbit b">
+            <svg viewBox="-100 -100 200 200">
+              <defs>
+                <linearGradient id="og2" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#a78bfa" stop-opacity="0"/>
+                  <stop offset="50%" stop-color="#a78bfa" stop-opacity=".7"/>
+                  <stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <ellipse cx="0" cy="0" rx="84" ry="32" fill="none" stroke="url(#og2)" stroke-width=".5"/>
+              <circle cx="84" cy="0" r="1.8" fill="#c4b5fd"/>
+            </svg>
+          </div>
+          <div class="orbit c">
+            <svg viewBox="-100 -100 200 200">
+              <ellipse cx="0" cy="0" rx="98" ry="98" fill="none" stroke="#8b5cf6" stroke-opacity=".25" stroke-width=".3"/>
+              <circle cx="0" cy="98" r="1.4" fill="#d4af37"/>
+              <circle cx="0" cy="-98" r="1.2" fill="#a78bfa"/>
+            </svg>
+          </div>
+          <div class="mark"></div>
+        </div>
+      </div>
 
       <div class="ticker">
         <span><span class="led"></span>LIVE</span>
@@ -552,66 +625,24 @@
         <span>Señales hoy <span class="num" id="ticker-sig">38,402</span></span>
       </div>
 
-      <div class="cover-stage">
-        <div class="planet"></div>
-        <div class="planet-core"></div>
-        <div class="orbit a">
-          <svg viewBox="-100 -100 200 200">
-            <defs>
-              <linearGradient id="og1" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#d4af37" stop-opacity="0"/>
-                <stop offset="50%" stop-color="#d4af37" stop-opacity=".9"/>
-                <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <ellipse cx="0" cy="0" rx="92" ry="92" fill="none" stroke="url(#og1)" stroke-width=".6" stroke-dasharray="2 4"/>
-            <circle cx="92" cy="0" r="2.2" fill="#f4d28a"/>
-            <circle cx="-92" cy="0" r="1.6" fill="#a78bfa"/>
-          </svg>
-        </div>
-        <div class="orbit b">
-          <svg viewBox="-100 -100 200 200">
-            <defs>
-              <linearGradient id="og2" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#a78bfa" stop-opacity="0"/>
-                <stop offset="50%" stop-color="#a78bfa" stop-opacity=".7"/>
-                <stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <ellipse cx="0" cy="0" rx="84" ry="32" fill="none" stroke="url(#og2)" stroke-width=".5"/>
-            <circle cx="84" cy="0" r="1.8" fill="#c4b5fd"/>
-          </svg>
-        </div>
-        <div class="orbit c">
-          <svg viewBox="-100 -100 200 200">
-            <ellipse cx="0" cy="0" rx="98" ry="98" fill="none" stroke="#8b5cf6" stroke-opacity=".25" stroke-width=".3"/>
-            <circle cx="0" cy="98" r="1.4" fill="#d4af37"/>
-            <circle cx="0" cy="-98" r="1.2" fill="#a78bfa"/>
-          </svg>
-        </div>
-        <div class="mark"></div>
-      </div>
-
-      <div class="hero">
-        <div class="hstack" style="justify-content:space-between;">
+      <div class="cover-text">
+        <div class="cover-top">
           <div class="brand">ATLAS <span class="a">·</span> ANALYTICS</div>
-          <div class="brand">2026 / 2027</div>
+          <div></div>
         </div>
 
-        <div style="max-width: 60%;">
-          <div class="eyebrow">Inteligencia Electoral</div>
-          <h1 class="hero-title">
-            Ganar elecciones<br/>
-            en la <span class="em">era del dato</span>.
-          </h1>
-          <p style="margin-top:1.6em; max-width: 28em; font-size:1.1em; color: var(--ink);">
-            Una nueva forma de hacer política: estratégica, predictiva y profundamente humana.
-          </p>
-        </div>
+        <div></div>
 
-        <div class="hero-foot">
-          <div class="brand">Presentación institucional</div>
-          <div class="brand">Confidencial</div>
+        <div class="cover-bottom">
+          <div class="title-block">
+            <div class="eyebrow">Inteligencia Electoral · 2026 / 2027</div>
+            <h1>Ganar elecciones<br/>en la <span class="em" style="background: linear-gradient(120deg,var(--gold-2),var(--gold),var(--violet-2)); -webkit-background-clip:text; background-clip:text; color:transparent; font-style:italic;">era del dato</span>.</h1>
+            <p class="lead">Una nueva forma de hacer política: estratégica, predictiva y profundamente humana.</p>
+          </div>
+          <div class="meta">
+            <span class="brand">Presentación institucional</span>
+            <span class="brand">Confidencial</span>
+          </div>
         </div>
       </div>
     </section>
