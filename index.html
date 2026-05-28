@@ -499,6 +499,39 @@
   /* compact lead */
   .lead-sm{ font-size:.85em; color: var(--ink-2); }
 
+  /* ===== NEURAL BRAIN CANVAS ===== */
+  .brain-stage{
+    position:absolute; top:50%; left: 3%; transform: translateY(-50%);
+    width: 58%; height: 86%; z-index: 1; pointer-events: auto;
+  }
+  .brain-stage canvas{
+    width: 100%; height: 100%; display:block;
+    filter: drop-shadow(0 0 60px rgba(139,92,246,.45));
+  }
+  .brain-stage::after{
+    content: "▸ MOVÉ EL CURSOR SOBRE EL CEREBRO";
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    font-family: var(--mono); font-size:.5em; letter-spacing:.3em;
+    color: var(--muted); opacity:.6; pointer-events:none;
+  }
+  .brain-text{
+    position:absolute; top:50%; right: 3%; transform: translateY(-50%);
+    width: 36%; z-index: 2;
+  }
+  .brain-stats{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 1em;
+    margin-top: 1.4em; padding-top: 1.2em; border-top: 1px solid var(--line);
+  }
+  .brain-stat .n{
+    font-family: var(--serif); font-size: 2.4em; line-height:1; font-weight:500;
+    background: linear-gradient(180deg, #fff, var(--violet-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .brain-stat .l{
+    font-family: var(--mono); font-size:.5em; letter-spacing:.18em; text-transform:uppercase;
+    color: var(--ink-2); margin-top:.3em; display:block;
+  }
+
   @media print { body::after, .hint { display:none; } }
 </style>
 </head>
@@ -754,10 +787,46 @@
           <p style="text-align:center; font-family: var(--mono); font-size:.55em; letter-spacing:.25em; color: var(--muted); margin-top: .8em;">SISTEMA INTEGRADO · 5 CAPAS</p>
         </div>
       </div>
-      <div class="pagefoot"><span>05 — Metodología</span><span class="sep"></span><span>06 / 13</span></div>
+      <div class="pagefoot"><span>05 — Metodología</span><span class="sep"></span><span>06 / 14</span></div>
     </section>
 
-    <!-- ========== 7. SEGMENTACIÓN ========== -->
+    <!-- ========== 7. CEREBRO ANALÍTICO ========== -->
+    <section data-transition="convex">
+      <div class="bg" style="background-image: url('assets/plexus-abstract.png'); background-position: left center;"></div>
+      <div class="veil right"></div>
+
+      <div class="brain-stage">
+        <canvas id="brain"></canvas>
+      </div>
+
+      <div class="brain-text">
+        <div class="eyebrow">Motor</div>
+        <h2>Cerebro analítico —<br/>el motor de la <em>decisión política</em>.</h2>
+        <p class="lead-sm" style="margin: 1em 0 1em;">
+          Un modelo que integra las cinco capas de datos en una sola red de inferencia: aprende patrones de voto, anticipa movimientos del electorado y propone acciones —no solo descripciones.
+        </p>
+        <ul class="ticks">
+          <li><strong>Aprendizaje continuo</strong> — el modelo se reentrena con cada nueva señal del territorio.</li>
+          <li><strong>Inferencia multicapa</strong> — combina señales heterogéneas en una sola lectura coherente.</li>
+          <li><strong>Recomendación accionable</strong> — no devuelve dashboards, devuelve próxima jugada.</li>
+        </ul>
+
+        <div class="brain-stats">
+          <div class="brain-stat">
+            <div class="n count" data-to="2400000" data-suffix="">0</div>
+            <span class="l">Nodos del modelo</span>
+          </div>
+          <div class="brain-stat">
+            <div class="n count" data-to="38000" data-suffix="/s">0/s</div>
+            <span class="l">Señales procesadas</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pagefoot"><span>06 — Cerebro analítico</span><span class="sep"></span><span>07 / 14</span></div>
+    </section>
+
+    <!-- ========== 8. SEGMENTACIÓN ========== -->
     <section data-transition="slide">
       <div class="bg" style="background-image: url('assets/globe-holographic.png');"></div>
       <div class="veil"></div>
@@ -830,7 +899,7 @@
         <div class="chip">Comerciantes</div>
       </div>
 
-      <div class="pagefoot"><span>06 — Segmentación</span><span class="sep"></span><span>07 / 13</span></div>
+      <div class="pagefoot"><span>07 — Segmentación</span><span class="sep"></span><span>08 / 14</span></div>
     </section>
 
     <!-- ========== 8. TERRITORIO ========== -->
@@ -876,7 +945,7 @@
           </div>
         </div>
       </div>
-      <div class="pagefoot"><span>07 — Territorio</span><span class="sep"></span><span>08 / 13</span></div>
+      <div class="pagefoot"><span>08 — Territorio</span><span class="sep"></span><span>09 / 14</span></div>
     </section>
 
     <!-- ========== 9. MENSAJERÍA ========== -->
@@ -919,7 +988,7 @@
         <div class="card tilt"><div class="num">B · EMOCIÓN</div><h3 style="font-size:1.15em;">Análisis emocional</h3><p>Tono, valencia y tema dominante por audiencia y momento.</p></div>
         <div class="card tilt"><div class="num">C · LOOP</div><h3 style="font-size:1.15em;">Optimización continua</h3><p>Lo que funciona escala. Lo que no, se descarta.</p></div>
       </div>
-      <div class="pagefoot"><span>08 — Mensajería</span><span class="sep"></span><span>09 / 13</span></div>
+      <div class="pagefoot"><span>09 — Mensajería</span><span class="sep"></span><span>10 / 14</span></div>
     </section>
 
     <!-- ========== 10. APLICACIONES ========== -->
@@ -963,7 +1032,7 @@
         Lo que antes tardaba <strong>semanas</strong>, ahora ocurre en <strong>horas</strong>.
       </p>
 
-      <div class="pagefoot"><span>09 — Aplicaciones</span><span class="sep"></span><span>10 / 13</span></div>
+      <div class="pagefoot"><span>10 — Aplicaciones</span><span class="sep"></span><span>11 / 14</span></div>
     </section>
 
     <!-- ========== 11. BENEFICIOS ========== -->
@@ -1010,7 +1079,7 @@
         </div>
       </div>
 
-      <div class="pagefoot"><span>10 — Beneficios</span><span class="sep"></span><span>11 / 13</span></div>
+      <div class="pagefoot"><span>11 — Beneficios</span><span class="sep"></span><span>12 / 14</span></div>
     </section>
 
     <!-- ========== 12. CLIENTES ========== -->
@@ -1050,7 +1119,7 @@
           </div>
         </div>
       </div>
-      <div class="pagefoot"><span>11 — Clientes</span><span class="sep"></span><span>12 / 13</span></div>
+      <div class="pagefoot"><span>12 — Clientes</span><span class="sep"></span><span>13 / 14</span></div>
     </section>
 
     <!-- ========== 13. CIERRE ========== -->
@@ -1153,17 +1222,23 @@
   });
 
   // ---- Animated counters when slide becomes current ----
+  function fmt(n){
+    if(n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M';
+    if(n >= 1000) return (n/1000).toFixed(n>=10000?0:1).replace('.0','') + 'k';
+    return n.toString();
+  }
   function animateCount(el){
     if(el.dataset.done) return;
     var to = parseFloat(el.dataset.to||0);
     var suf = el.dataset.suffix||'';
     var pre = el.dataset.prefix||'';
-    var dur = 1400, start = performance.now();
+    var big = to >= 1000;
+    var dur = 1500, start = performance.now();
     var step = function(t){
       var p = Math.min(1, (t-start)/dur);
       var e = 1 - Math.pow(1-p, 3);
       var v = Math.round(to*e);
-      el.textContent = pre + v + suf;
+      el.textContent = pre + (big ? fmt(v) : v) + suf;
       if(p<1) requestAnimationFrame(step);
       else el.dataset.done = '1';
     };
@@ -1189,6 +1264,194 @@
       if(!wasOpen){ s.classList.add('open'); s.querySelector('.seg-more').textContent='—'; }
     });
   });
+
+  // ---- Neural brain canvas ----
+  (function(){
+    var c = document.getElementById('brain'); if(!c) return;
+    var ctx = c.getContext('2d');
+    var dpr = Math.max(1, window.devicePixelRatio || 1);
+    var W=0, H=0, points=[], signals=[];
+    var mouse = {x:-9999, y:-9999};
+
+    function brainShape(nx, ny){
+      // Brain silhouette in normalized 0..1 coords (top-down view)
+      var dx = nx - 0.5, dy = ny - 0.5;
+      var outer = (dx*dx)/(0.42*0.42) + (dy*dy)/(0.34*0.34);
+      if(outer > 1) return false;
+      // Central longitudinal fissure
+      if(Math.abs(dx) < 0.018 && ny > 0.18 && ny < 0.82) return false;
+      // Lobed cutouts to suggest gyri
+      var bumps = Math.sin(nx*14) * 0.018 + Math.cos(ny*12) * 0.018;
+      if(outer > 0.93 + bumps) return false;
+      // Cerebellum cut (bottom curve out)
+      if(ny > 0.78 && Math.abs(dx) > 0.18) return false;
+      return true;
+    }
+
+    function size(){
+      var r = c.getBoundingClientRect();
+      W = r.width; H = r.height;
+      c.width = W * dpr; c.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function init(){
+      size();
+      points = []; signals = [];
+      var TARGET = Math.min(560, Math.max(280, Math.floor(W*H/950)));
+      var tries=0, max=TARGET*60;
+      while(points.length < TARGET && tries < max){
+        var nx = Math.random(), ny = Math.random();
+        if(brainShape(nx, ny)){
+          points.push({
+            x: nx*W, y: ny*H,
+            ox: nx*W, oy: ny*H,
+            vx: 0, vy: 0,
+            r: 1 + Math.random()*1.6,
+            pulse: Math.random()*Math.PI*2,
+            pSpeed: 0.025 + Math.random()*0.04,
+          });
+        }
+        tries++;
+      }
+      // neighbor index
+      var R = Math.min(W,H)*0.075;
+      for(var i=0;i<points.length;i++){
+        var p = points[i]; p.nbrs = [];
+        for(var j=0;j<points.length;j++){
+          if(i===j) continue;
+          var d = Math.hypot(p.x-points[j].x, p.y-points[j].y);
+          if(d < R) p.nbrs.push(j);
+        }
+      }
+    }
+
+    c.addEventListener('mousemove', function(e){
+      var r = c.getBoundingClientRect();
+      mouse.x = e.clientX - r.left;
+      mouse.y = e.clientY - r.top;
+    });
+    c.addEventListener('mouseleave', function(){ mouse.x=-9999; mouse.y=-9999; });
+
+    function spawnSignal(){
+      if(!points.length) return;
+      var i = (Math.random()*points.length)|0;
+      var p = points[i]; if(!p.nbrs || !p.nbrs.length) return;
+      var j = p.nbrs[(Math.random()*p.nbrs.length)|0];
+      signals.push({from:i, to:j, t:0, hops: 4 + ((Math.random()*5)|0)});
+    }
+
+    var R2;
+    function frame(){
+      R2 = Math.min(W,H)*0.075;
+      // soft trail clear
+      ctx.fillStyle = 'rgba(6,5,13,.18)';
+      ctx.fillRect(0, 0, W, H);
+
+      // update + draw connections + nodes
+      for(var i=0;i<points.length;i++){
+        var p = points[i];
+        var dx = mouse.x - p.x, dy = mouse.y - p.y;
+        var d = Math.hypot(dx, dy);
+        if(d < 90){
+          var f = (90 - d) / 90;
+          p.vx += (dx/(d||1)) * f * 0.5;
+          p.vy += (dy/(d||1)) * f * 0.5;
+        }
+        p.vx += (p.ox - p.x) * 0.014;
+        p.vy += (p.oy - p.y) * 0.014;
+        p.vx *= 0.86; p.vy *= 0.86;
+        p.x += p.vx; p.y += p.vy;
+        p.pulse += p.pSpeed;
+      }
+
+      // connections
+      ctx.lineWidth = 0.5;
+      for(var i=0;i<points.length;i++){
+        var p = points[i];
+        if(!p.nbrs) continue;
+        for(var k=0;k<p.nbrs.length;k++){
+          var j = p.nbrs[k]; if(j<i) continue;
+          var q = points[j];
+          var dd = Math.hypot(p.x-q.x, p.y-q.y);
+          if(dd > R2) continue;
+          var a = (1 - dd/R2) * 0.28;
+          ctx.strokeStyle = 'rgba(167,139,250,' + a.toFixed(3) + ')';
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+          ctx.stroke();
+        }
+      }
+
+      // nodes pulsing
+      for(var i=0;i<points.length;i++){
+        var p = points[i];
+        var pl = (Math.sin(p.pulse) + 1) / 2;
+        var r = p.r + pl * 0.6;
+        ctx.fillStyle = 'rgba(196,181,253,' + (0.45 + pl*0.45).toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+        ctx.fill();
+      }
+
+      // firing signals
+      if(Math.random() < 0.18) spawnSignal();
+      if(Math.random() < 0.05) spawnSignal();
+      for(var s = signals.length - 1; s >= 0; s--){
+        var sig = signals[s];
+        sig.t += 0.07;
+        var p = points[sig.from], q = points[sig.to];
+        if(!p || !q){ signals.splice(s,1); continue; }
+        var x = p.x + (q.x - p.x) * sig.t;
+        var y = p.y + (q.y - p.y) * sig.t;
+        // pulse glow
+        var grad = ctx.createRadialGradient(x, y, 0, x, y, 16);
+        grad.addColorStop(0, 'rgba(244,210,138,.95)');
+        grad.addColorStop(0.4, 'rgba(212,175,55,.45)');
+        grad.addColorStop(1, 'rgba(212,175,55,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, 16, 0, Math.PI*2);
+        ctx.fill();
+        // bright trail
+        ctx.strokeStyle = 'rgba(244,210,138,.8)';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y); ctx.lineTo(x, y);
+        ctx.stroke();
+
+        if(sig.t >= 1){
+          if(sig.hops > 0 && q.nbrs && q.nbrs.length){
+            var next = q.nbrs[(Math.random()*q.nbrs.length)|0];
+            if(next !== sig.from){
+              signals.push({from: sig.to, to: next, t: 0, hops: sig.hops - 1});
+            }
+          }
+          signals.splice(s,1);
+        }
+      }
+
+      raf = requestAnimationFrame(frame);
+    }
+
+    var raf = null;
+    function start(){
+      if(raf) return;
+      init();
+      raf = requestAnimationFrame(frame);
+    }
+    function stop(){
+      if(raf) cancelAnimationFrame(raf);
+      raf = null;
+    }
+    // Only render when slide is current (perf)
+    Reveal.on('slidechanged', function(e){
+      if(e.currentSlide.contains(c)){ start(); }
+      else { stop(); }
+    });
+    if(Reveal.getCurrentSlide && Reveal.getCurrentSlide() && Reveal.getCurrentSlide().contains(c)) start();
+    window.addEventListener('resize', function(){ if(raf){ init(); } });
+  })();
 
   // ---- Live ticker on cover ----
   (function(){
