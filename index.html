@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Atlas Analytics — Inteligencia Electoral</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --bg-0:#06050d;
+    --bg-1:#0d0a1f;
+    --violet:#8b5cf6;
+    --violet-2:#a78bfa;
+    --violet-3:#c4b5fd;
+    --violet-glow:rgba(139,92,246,.45);
+    --gold:#d4af37;
+    --gold-2:#f4d28a;
+    --gold-glow:rgba(212,175,55,.3);
+    --ink:#f3f1fa;
+    --ink-2:#c8c5d8;
+    --muted:#7c7990;
+    --line:rgba(255,255,255,.08);
+    --line-strong:rgba(255,255,255,.18);
+    --serif:'Cormorant Garamond', serif;
+    --sans:'Inter', system-ui, sans-serif;
+    --mono:'JetBrains Mono', monospace;
+  }
+
+  html, body { background: var(--bg-0); color: var(--ink); overflow:hidden; }
+
+  /* Persistent atmospheric grain layer */
+  body::after{
+    content:""; position:fixed; inset:0; z-index: 5; pointer-events:none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .12 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity:.35; mix-blend-mode: overlay;
+  }
+
+  .reveal { font-family: var(--sans); color: var(--ink); }
+  .reveal .slides { text-align: left; }
+  .reveal section { padding: 1.6em 2em; }
+
+  /* ===== BACKGROUND IMAGE WRAPPER WITH KEN BURNS + VIGNETTE ===== */
+  .bg{
+    position:absolute; inset:0; z-index:-2; overflow:hidden;
+    background-position:center; background-size:cover;
+    transform: scale(1.08);
+    transition: transform 14s ease-out;
+    filter: saturate(1.1) contrast(1.05);
+  }
+  section.present .bg{ transform: scale(1.18) translate(var(--kx,1%), var(--ky,-1%)); }
+  /* darken overlay for readability */
+  .veil{
+    position:absolute; inset:0; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(900px 600px at var(--vx,30%) var(--vy,40%), rgba(167,139,250,.18), transparent 65%),
+      linear-gradient(180deg, rgba(6,5,13,.65) 0%, rgba(6,5,13,.55) 40%, rgba(6,5,13,.85) 100%),
+      linear-gradient(90deg, rgba(6,5,13,.7) 0%, rgba(6,5,13,.15) 50%, rgba(6,5,13,.7) 100%);
+  }
+  .veil.right{ background: linear-gradient(90deg, rgba(6,5,13,.92) 0%, rgba(6,5,13,.78) 35%, rgba(6,5,13,.1) 75%, rgba(6,5,13,.3) 100%), linear-gradient(180deg, rgba(6,5,13,.55), rgba(6,5,13,.85)); }
+  .veil.left{  background: linear-gradient(90deg, rgba(6,5,13,.2) 0%, rgba(6,5,13,.55) 45%, rgba(6,5,13,.85) 75%, rgba(6,5,13,.95) 100%), linear-gradient(180deg, rgba(6,5,13,.55), rgba(6,5,13,.85)); }
+  .veil.center{ background: radial-gradient(ellipse at center, rgba(6,5,13,.5) 0%, rgba(6,5,13,.92) 75%); }
+  .veil.bottom{ background: linear-gradient(180deg, rgba(6,5,13,.25) 0%, rgba(6,5,13,.55) 45%, rgba(6,5,13,.95) 100%); }
+
+  /* grid overlay */
+  .grid-overlay{
+    position:absolute; inset:0; z-index:-1; pointer-events:none; opacity:.35;
+    background-image:
+      linear-gradient(rgba(167,139,250,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(167,139,250,.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 90%);
+  }
+
+  /* ===== TYPOGRAPHY ===== */
+  .reveal h1, .reveal h2, .reveal h3 { font-family: var(--serif); font-weight: 500; letter-spacing:-.01em; color: var(--ink); text-transform:none; text-shadow: 0 4px 32px rgba(0,0,0,.6); }
+  .reveal h1 { font-size: 4.6em; line-height: 1.0; }
+  .reveal h2 { font-size: 2.8em; line-height: 1.06; }
+  .reveal h3 { font-size: 1.6em; line-height: 1.2; font-weight:400; }
+  .reveal p, .reveal li { font-family: var(--sans); font-weight: 300; font-size: .82em; line-height: 1.55; color: var(--ink-2); text-shadow: 0 1px 8px rgba(0,0,0,.5); }
+  .reveal em { color: var(--gold-2); font-style: italic; }
+  .reveal strong { color: var(--ink); font-weight: 600; }
+
+  .eyebrow{
+    font-family: var(--mono); font-size:.55em; letter-spacing:.4em; text-transform:uppercase;
+    color: var(--violet-2); opacity:.95; margin-bottom:.8em; display:inline-flex; align-items:center; gap:.8em;
+    text-shadow: 0 0 18px var(--violet-glow);
+  }
+  .eyebrow::before{ content:""; width:40px; height:1px; background: linear-gradient(90deg, var(--violet), transparent); }
+  .eyebrow::after { content:""; width:8px; height:8px; border-radius:50%; background: var(--violet-2); box-shadow: 0 0 14px var(--violet-2); animation: pulse 2s ease-in-out infinite; }
+
+  .kicker{ font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--gold-2); font-size:1.05em; line-height:1.3; }
+
+  .quote{
+    font-family: var(--serif); font-style: italic; font-weight: 300;
+    font-size: 1.8em; line-height: 1.35; color: var(--ink);
+    border-left: 2px solid var(--gold); padding-left:1em; max-width: 22em;
+  }
+  .quote::before{ content:"\201C"; color: var(--gold); font-size:1.4em; line-height:0; vertical-align:-.2em; margin-right:.05em; }
+
+  /* ===== LAYOUT ===== */
+  .grid { display:grid; gap: 1.6em; }
+  .g-2 { grid-template-columns: 1fr 1fr; }
+  .g-3 { grid-template-columns: repeat(3,1fr); }
+  .g-4 { grid-template-columns: repeat(4,1fr); }
+  .g-5 { grid-template-columns: repeat(5,1fr); }
+  .stack { display:flex; flex-direction:column; gap:.8em; }
+  .hstack { display:flex; gap:1.2em; align-items:center; }
+  .between{ display:flex; justify-content:space-between; align-items:flex-end; }
+
+  /* ===== GLASS CARDS WITH 3D TILT ===== */
+  .card{
+    position:relative; cursor: default;
+    background: linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.015));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1.4em 1.3em;
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    transition: transform .4s cubic-bezier(.2,.7,.2,1), border-color .4s, box-shadow .4s, background .4s;
+    overflow:hidden;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .card::before{
+    content:""; position:absolute; inset:0;
+    background: radial-gradient(500px 250px at var(--mx,30%) var(--my,20%), rgba(212,175,55,.15), transparent 60%);
+    opacity:0; transition: opacity .4s; pointer-events:none;
+  }
+  .card::after{
+    content:""; position:absolute; inset:0; border-radius: 16px;
+    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,.08) 50%, transparent 70%);
+    opacity:0; transition: opacity .4s; pointer-events:none;
+    transform: translateX(-100%);
+  }
+  .card:hover{
+    border-color: rgba(212,175,55,.4);
+    background: linear-gradient(160deg, rgba(212,175,55,.08), rgba(139,92,246,.03));
+    box-shadow: 0 30px 80px -20px rgba(139,92,246,.4), 0 0 0 1px rgba(212,175,55,.2);
+  }
+  .card:hover::before{ opacity:1; }
+  .card:hover::after{ opacity:1; transform: translateX(100%); transition: transform 1s, opacity .4s; }
+  .card .num{ font-family: var(--mono); color: var(--violet-2); font-size:.65em; letter-spacing:.28em; opacity:.9; text-shadow: 0 0 12px var(--violet-glow); }
+  .card h3 { font-family: var(--serif); font-size: 1.4em; margin: .2em 0 .45em; color:var(--ink); }
+  .card p { font-size: .76em; color: var(--ink-2); margin:0; }
+
+  /* ===== METRICS ===== */
+  .metric { text-align:left; }
+  .metric .v{
+    font-family: var(--serif); font-weight: 500; font-size: 3.8em; line-height:1;
+    background: linear-gradient(180deg, #ffffff 0%, var(--gold-2) 60%, var(--gold) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing:-.02em;
+    filter: drop-shadow(0 4px 20px rgba(212,175,55,.35));
+  }
+  .metric .v.violet{
+    background: linear-gradient(180deg, #ffffff 0%, var(--violet-2) 60%, var(--violet) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 4px 20px rgba(139,92,246,.4));
+  }
+  .metric .l{ font-family: var(--mono); font-size:.55em; letter-spacing:.2em; text-transform:uppercase; color: var(--ink-2); margin-top:.6em; display:block; }
+  .metric .s{ font-size:.85em; color: var(--ink-2); margin-top:.4em; max-width:14em; }
+
+  /* ===== PILLS ===== */
+  .pill{
+    display:inline-flex; align-items:center; gap:.5em;
+    padding:.4em 1em; border:1px solid var(--line-strong); border-radius:999px;
+    font-family: var(--mono); font-size:.55em; letter-spacing:.2em; text-transform:uppercase;
+    color: var(--ink-2); background: rgba(0,0,0,.35);
+    backdrop-filter: blur(8px);
+  }
+  .pill.gold{ color: var(--gold-2); border-color: rgba(212,175,55,.45); box-shadow: 0 0 20px rgba(212,175,55,.15); }
+  .pill.violet{ color: var(--violet-2); border-color: rgba(139,92,246,.5); box-shadow: 0 0 20px rgba(139,92,246,.15); }
+
+  /* ===== TICK LIST ===== */
+  .ticks { list-style:none; padding:0; margin:0; }
+  .ticks li{ position:relative; padding-left:1.6em; margin: .55em 0; font-size:.82em; color: var(--ink-2); }
+  .ticks li::before{
+    content:""; position:absolute; left:0; top:.65em;
+    width:.6em; height:.6em; border-radius:50%;
+    background: radial-gradient(circle, var(--gold) 0%, var(--gold) 40%, transparent 70%);
+    box-shadow: 0 0 14px var(--gold-glow);
+  }
+
+  /* ===== HERO ===== */
+  .hero{
+    position: relative; height: 100%;
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding: 3em 3.5em;
+  }
+  .hero-title{
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(3em, 7.5vw, 7.8em); line-height:.95; letter-spacing:-.02em;
+  }
+  .hero-title .em{
+    background: linear-gradient(120deg, var(--gold-2) 0%, var(--gold) 40%, var(--violet-2) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    font-style: italic;
+    filter: drop-shadow(0 0 30px var(--gold-glow));
+  }
+  .brand{ font-family: var(--mono); letter-spacing:.36em; font-size:.6em; color:var(--ink-2); }
+  .brand .a{ color: var(--gold-2); }
+  .hero-foot{ display:flex; justify-content:space-between; align-items:flex-end; }
+
+  /* ===== DIVIDER ===== */
+  .rule{ height:1px; background: linear-gradient(90deg, transparent, var(--line-strong), transparent); margin: 1.2em 0; }
+
+  /* ===== TITLE BLOCK ===== */
+  .titleblock{ max-width: 24em; }
+  .titleblock h2{ margin: 0 0 .35em; }
+  .titleblock .lead{ font-size: 1em; color: var(--ink-2); font-weight:300; }
+
+  /* ===== INTERACTIVE HEATMAP ===== */
+  .heatmap{
+    display:grid; grid-template-columns: repeat(14, 1fr); gap:3px;
+    padding: 18px; border-radius: 14px;
+    background: rgba(0,0,0,.45); border:1px solid var(--line);
+    backdrop-filter: blur(12px);
+  }
+  .heatmap .cell{
+    aspect-ratio: 1/1; border-radius: 3px;
+    background: rgba(139,92,246,.05);
+    transition: transform .3s, background .3s, box-shadow .3s;
+    cursor: pointer;
+  }
+  .heatmap .cell.h1{ background: rgba(139,92,246,.18); }
+  .heatmap .cell.h2{ background: rgba(139,92,246,.35); }
+  .heatmap .cell.h3{ background: rgba(167,139,250,.55); }
+  .heatmap .cell.h4{ background: rgba(212,175,55,.7); box-shadow: 0 0 10px var(--gold-glow); }
+  .heatmap .cell.h5{ background: var(--gold); box-shadow: 0 0 24px var(--gold); }
+  .heatmap .cell:hover{ transform: scale(1.5); z-index: 2; box-shadow: 0 0 30px var(--gold); background: var(--gold-2); }
+
+  /* ===== LAYERS DIAGRAM ===== */
+  .layers{ position:relative; height: 380px; cursor: default; }
+  .layers .layer{
+    position:absolute; left:50%; transform: translateX(-50%);
+    border:1px solid var(--line-strong); border-radius: 16px;
+    background: linear-gradient(180deg, rgba(139,92,246,.12), rgba(139,92,246,.02));
+    padding: .9em 1.5em;
+    font-family: var(--mono); font-size:.6em; letter-spacing:.24em; text-transform:uppercase; color: var(--ink);
+    backdrop-filter: blur(10px); cursor: pointer;
+    transition: transform .4s cubic-bezier(.2,.8,.2,1), border-color .4s, box-shadow .4s, background .4s;
+  }
+  .layers .layer:hover{
+    border-color: var(--gold); background: rgba(212,175,55,.12);
+    box-shadow: 0 0 40px var(--gold-glow), inset 0 0 20px rgba(212,175,55,.1);
+    transform: translateX(-50%) scale(1.04);
+  }
+  .layers .l1{ top: 0;    width: 56%; }
+  .layers .l2{ top: 72px;  width: 66%; }
+  .layers .l3{ top: 144px; width: 78%; }
+  .layers .l4{ top: 216px; width: 68%; }
+  .layers .l5{ top: 288px; width: 58%; }
+
+  /* ===== BARS ===== */
+  .bar{ position:relative; height:6px; border-radius:999px; background: rgba(255,255,255,.08); overflow:hidden; }
+  .bar > span{
+    position:absolute; left:0; top:0; bottom:0;
+    background: linear-gradient(90deg, var(--violet), var(--gold));
+    width: 0%; transition: width 2s cubic-bezier(.2,.8,.2,1);
+    box-shadow: 0 0 18px var(--violet-glow);
+  }
+  .reveal .present .bar > span{ width: var(--w, 60%); }
+
+  /* ===== FOOTER ===== */
+  .pagefoot{
+    position:absolute; left:2em; right:2em; bottom:1em; z-index:4;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family: var(--mono); font-size:.45em; letter-spacing:.32em; text-transform:uppercase;
+    color: var(--muted);
+  }
+  .pagefoot .sep{ flex:1; height:1px; background: var(--line); margin: 0 1.2em; }
+
+  /* ===== REVEAL UI ===== */
+  .reveal .controls { color: var(--gold-2); }
+  .reveal .progress { color: var(--gold); height:3px; background: rgba(255,255,255,.05); }
+  .reveal .slide-number { font-family: var(--mono); background: transparent; color: var(--ink-2); font-size: 12px; letter-spacing:.2em; }
+  .reveal .slides > section { transition: transform .9s cubic-bezier(.2,.7,.2,1), opacity .6s; }
+
+  /* ===== CHIPS ===== */
+  .chips{ display:flex; flex-wrap:wrap; gap:.5em; }
+  .chip{
+    padding:.4em 1em; border-radius:999px;
+    background: rgba(139,92,246,.12); border:1px solid rgba(139,92,246,.35);
+    font-size:.7em; color: var(--ink); font-family: var(--sans);
+    transition: background .3s, transform .3s, border-color .3s;
+    cursor: pointer;
+  }
+  .chip:hover{ background: rgba(212,175,55,.18); border-color: var(--gold); transform: translateY(-2px); }
+  .chip.g{ background: rgba(212,175,55,.1); border-color: rgba(212,175,55,.4); color: var(--gold-2); }
+
+  /* ===== CLOSING ===== */
+  .closing{
+    position:relative;
+    height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center;
+    text-align:center; padding: 2em;
+  }
+  .closing .mono{ font-family: var(--mono); letter-spacing:.55em; color: var(--violet-2); font-size:.7em; text-shadow: 0 0 24px var(--violet-glow); }
+  .closing h1{ font-size: 5.2em; line-height:1.0; margin: .5em 0; }
+  .closing h1 .em{
+    background: linear-gradient(120deg, var(--gold-2), var(--gold), var(--violet-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent; font-style:italic;
+    filter: drop-shadow(0 0 30px var(--gold-glow));
+  }
+  .cta{
+    margin-top: 2.4em; display:inline-flex; align-items:center; gap:.9em;
+    padding: 1em 1.8em; border:1px solid var(--gold); border-radius: 999px;
+    font-family: var(--mono); font-size:.6em; letter-spacing:.32em; text-transform:uppercase;
+    color: var(--gold-2); background: rgba(212,175,55,.08);
+    transition: background .3s, transform .3s, box-shadow .3s;
+    backdrop-filter: blur(10px); text-decoration:none;
+  }
+  .cta:hover{ background: rgba(212,175,55,.22); transform: translateY(-3px); box-shadow: 0 0 50px var(--gold-glow); }
+  .cta .dot{ width:7px; height:7px; border-radius:50%; background: var(--gold); box-shadow: 0 0 14px var(--gold); animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{opacity:.5; transform:scale(1);} 50%{opacity:1; transform:scale(1.5);} }
+
+  /* ===== HINT ===== */
+  .hint{
+    position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 30;
+    font-family: var(--mono); font-size: 10px; letter-spacing:.32em; text-transform:uppercase;
+    color: var(--muted); opacity:.6; pointer-events:none;
+    animation: fadeOut .4s ease 7s forwards;
+  }
+  @keyframes fadeOut{ to{opacity:0;} }
+
+  /* ===== BIG NUMBERED LIST ===== */
+  .bignum{
+    display:flex; gap:1.2em; align-items:flex-start; padding: 1em 0;
+    border-top: 1px solid var(--line);
+    transition: padding .3s;
+  }
+  .bignum:first-child{ border-top: none; }
+  .bignum:hover{ padding-left: .6em; }
+  .bignum:hover .n{ color: var(--gold-2); transform: scale(1.15); }
+  .bignum .n{
+    font-family: var(--serif); font-style: italic; font-weight: 400;
+    font-size: 2.4em; line-height: 1; color: var(--gold); width: 1.8em; flex-shrink:0;
+    transition: color .3s, transform .3s; transform-origin: left center;
+  }
+  .bignum .t{ font-family: var(--serif); font-size: 1.5em; color: var(--ink); line-height:1.15; }
+  .bignum .d{ font-size:.78em; color: var(--ink-2); margin-top:.3em; max-width: 28em; }
+
+  /* ===== CHANNEL MATRIX ===== */
+  .matrix{
+    display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap:0;
+    border:1px solid var(--line); border-radius: 14px; overflow:hidden;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(14px);
+  }
+  .matrix > div{
+    padding: 1em 1.2em; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    font-size:.78em; color: var(--ink-2);
+    transition: background .3s;
+  }
+  .matrix > div:hover{ background: rgba(212,175,55,.06); }
+  .matrix .head{
+    background: rgba(139,92,246,.15); color: var(--violet-2);
+    font-family: var(--mono); font-size:.55em; letter-spacing:.24em; text-transform:uppercase;
+  }
+  .matrix .row-h{ color: var(--ink); font-family: var(--serif); font-style:italic; font-size: 1em; font-weight:500; }
+
+  /* ===== TARGET ENTITY ===== */
+  .target{
+    border-left: 2px solid var(--gold); padding-left: 1.2em; margin-bottom: 1.2em;
+    transition: border-color .3s, padding-left .3s;
+  }
+  .target:hover{ border-color: var(--gold-2); padding-left: 1.6em; }
+  .target h4{ margin: 0; font-family: var(--serif); font-style: italic; font-size: 1.4em; color: var(--gold-2); font-weight:400; }
+  .target p{ margin:.25em 0 0; font-size:.78em; color: var(--ink-2); }
+
+  /* ===== LIVE TICKER ===== */
+  .ticker{
+    position:absolute; top: 22px; right: 2em; z-index:4;
+    display:flex; gap: 1.6em; align-items:center;
+    font-family: var(--mono); font-size:.5em; letter-spacing:.18em; text-transform:uppercase;
+    color: var(--ink-2);
+  }
+  .ticker .led{ width:7px; height:7px; border-radius:50%; background: #10b981; box-shadow: 0 0 12px #10b981; animation: pulse 1.6s ease-in-out infinite; display:inline-block; margin-right:.5em; vertical-align:middle; }
+  .ticker .num{ color: var(--gold-2); font-weight:500; margin-left:.5em; }
+
+  /* ===== INTERACTIVE SEGMENT CARDS ===== */
+  .seg{
+    position:relative; cursor:pointer;
+    background: linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.015));
+    border: 1px solid var(--line);
+    border-radius: 16px; padding: 1.3em 1.2em;
+    backdrop-filter: blur(14px);
+    transition: all .4s cubic-bezier(.2,.7,.2,1);
+    overflow: hidden;
+  }
+  .seg .seg-icon{
+    width: 44px; height: 44px; border-radius: 12px; margin-bottom: .8em;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(135deg, rgba(139,92,246,.25), rgba(167,139,250,.1));
+    border:1px solid rgba(139,92,246,.4); font-size: 1.4em; color: var(--violet-2);
+  }
+  .seg h3{ font-family: var(--serif); font-size: 1.2em; margin: 0 0 .3em; color: var(--ink); }
+  .seg p{ font-size:.72em; color: var(--ink-2); margin:0; line-height:1.45; }
+  .seg .seg-detail{
+    max-height: 0; opacity:0; overflow: hidden;
+    transition: max-height .5s ease, opacity .4s ease, margin-top .4s;
+    border-top: 1px solid var(--line);
+    margin-top: 0;
+  }
+  .seg.open{ background: linear-gradient(160deg, rgba(212,175,55,.1), rgba(139,92,246,.05)); border-color: rgba(212,175,55,.45); transform: translateY(-4px); box-shadow: 0 30px 80px -20px rgba(212,175,55,.3); }
+  .seg.open .seg-detail{ max-height: 240px; opacity:1; margin-top: .9em; padding-top: .8em; }
+  .seg .seg-detail p{ font-size:.7em; }
+  .seg .seg-detail .pct{ color: var(--gold-2); font-family: var(--mono); font-size:.65em; letter-spacing:.18em; margin-top:.5em; display:block; }
+  .seg .seg-more{
+    position:absolute; top:1.3em; right:1.2em;
+    font-family: var(--mono); font-size:.5em; letter-spacing:.2em; color: var(--violet-2);
+    border: 1px solid rgba(139,92,246,.4); border-radius:999px; padding:.25em .7em;
+    transition: all .3s;
+  }
+  .seg.open .seg-more{ color: var(--gold-2); border-color: rgba(212,175,55,.6); background: rgba(212,175,55,.08); }
+
+  /* ===== HOTSPOT (clickable dot on map) ===== */
+  .hotspot{
+    position:absolute; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--gold); box-shadow: 0 0 0 0 var(--gold);
+    cursor:pointer; transform: translate(-50%,-50%);
+    animation: ring 2.4s ease-out infinite;
+  }
+  @keyframes ring{
+    0%{ box-shadow: 0 0 0 0 rgba(212,175,55,.7); }
+    100%{ box-shadow: 0 0 0 28px rgba(212,175,55,0); }
+  }
+
+  /* ===== COVER STAGE (rotating planet + static logo) ===== */
+  .cover-stage{
+    position:absolute; top: 50%; right: 4%; transform: translateY(-50%);
+    width: clamp(420px, 42vw, 700px); aspect-ratio: 1/1;
+    z-index: 0; pointer-events: none;
+  }
+
+  /* Rotating planet — circular mask, behind everything */
+  .planet{
+    position:absolute; inset: 4%; border-radius: 50%;
+    background-image: url("assets/globe-plexus.png");
+    background-size: 180% 180%;
+    background-position: center;
+    animation: spinPlanet 45s linear infinite;
+    filter: hue-rotate(-5deg) saturate(1.25) brightness(1.05) drop-shadow(0 0 80px rgba(167,139,250,.8));
+    mask-image: radial-gradient(circle at center, black 58%, transparent 78%);
+    -webkit-mask-image: radial-gradient(circle at center, black 58%, transparent 78%);
+    opacity: .85;
+  }
+  /* Inner core glow that pulses */
+  .planet-core{
+    position:absolute; inset: 22%; border-radius:50%;
+    background: radial-gradient(circle at 40% 40%, rgba(196,181,253,.55) 0%, rgba(139,92,246,.25) 35%, transparent 65%);
+    filter: blur(8px);
+    animation: pulseCore 4.5s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes pulseCore{ 0%,100%{ transform: scale(1); opacity:.7;} 50%{ transform: scale(1.08); opacity:1;} }
+
+  /* Orbit rings — two SVGs counter-rotating */
+  .orbit{
+    position:absolute; inset: 0;
+    pointer-events: none;
+  }
+  .orbit svg{ width:100%; height:100%; overflow:visible; }
+  .orbit.a{ animation: spinOrbit 60s linear infinite; }
+  .orbit.b{ animation: spinOrbit 90s linear infinite reverse; transform: rotate(20deg); }
+  .orbit.c{ animation: spinOrbit 120s linear infinite; transform: rotate(-35deg); }
+  @keyframes spinOrbit{ to{ transform: rotate(360deg);} }
+
+  /* Static logo mark on top */
+  .mark{
+    position:absolute; inset: 0;
+    background-image: url("assets/logo-globe.png");
+    background-size: 78% 78%;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 0 60px rgba(196,181,253,.5));
+    animation: floatLogo 7s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes floatLogo{
+    0%,100%{ transform: translateY(0) rotate(-.5deg);}
+    50%{ transform: translateY(-12px) rotate(.6deg);}
+  }
+  @keyframes spinPlanet{ to{ transform: rotate(360deg);} }
+
+  .reveal .slides section, .reveal .slides section > section { text-transform: none; }
+
+  /* compact lead */
+  .lead-sm{ font-size:.85em; color: var(--ink-2); }
+
+  @media print { body::after, .hint { display:none; } }
+</style>
+</head>
+<body>
+
+<div class="hint">flechas para navegar · F pantalla completa · ESC vista general · clickea elementos para explorar</div>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ========== 1. COVER ========== -->
+    <section data-transition="fade">
+      <div class="bg" style="background-image: url('assets/plexus-abstract.png'); background-position: right center;"></div>
+      <div class="veil left"></div>
+      <div class="grid-overlay"></div>
+
+      <div class="ticker">
+        <span><span class="led"></span>LIVE</span>
+        <span>Conversación monitoreada <span class="num" id="ticker-conv">1,247,318</span></span>
+        <span>Señales hoy <span class="num" id="ticker-sig">38,402</span></span>
+      </div>
+
+      <div class="cover-stage">
+        <div class="planet"></div>
+        <div class="planet-core"></div>
+        <div class="orbit a">
+          <svg viewBox="-100 -100 200 200">
+            <defs>
+              <linearGradient id="og1" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#d4af37" stop-opacity="0"/>
+                <stop offset="50%" stop-color="#d4af37" stop-opacity=".9"/>
+                <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <ellipse cx="0" cy="0" rx="92" ry="92" fill="none" stroke="url(#og1)" stroke-width=".6" stroke-dasharray="2 4"/>
+            <circle cx="92" cy="0" r="2.2" fill="#f4d28a"/>
+            <circle cx="-92" cy="0" r="1.6" fill="#a78bfa"/>
+          </svg>
+        </div>
+        <div class="orbit b">
+          <svg viewBox="-100 -100 200 200">
+            <defs>
+              <linearGradient id="og2" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#a78bfa" stop-opacity="0"/>
+                <stop offset="50%" stop-color="#a78bfa" stop-opacity=".7"/>
+                <stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <ellipse cx="0" cy="0" rx="84" ry="32" fill="none" stroke="url(#og2)" stroke-width=".5"/>
+            <circle cx="84" cy="0" r="1.8" fill="#c4b5fd"/>
+          </svg>
+        </div>
+        <div class="orbit c">
+          <svg viewBox="-100 -100 200 200">
+            <ellipse cx="0" cy="0" rx="98" ry="98" fill="none" stroke="#8b5cf6" stroke-opacity=".25" stroke-width=".3"/>
+            <circle cx="0" cy="98" r="1.4" fill="#d4af37"/>
+            <circle cx="0" cy="-98" r="1.2" fill="#a78bfa"/>
+          </svg>
+        </div>
+        <div class="mark"></div>
+      </div>
+
+      <div class="hero">
+        <div class="hstack" style="justify-content:space-between;">
+          <div class="brand">ATLAS <span class="a">·</span> ANALYTICS</div>
+          <div class="brand">2026 / 2027</div>
+        </div>
+
+        <div style="max-width: 60%;">
+          <div class="eyebrow">Inteligencia Electoral</div>
+          <h1 class="hero-title">
+            Ganar elecciones<br/>
+            en la <span class="em">era del dato</span>.
+          </h1>
+          <p style="margin-top:1.6em; max-width: 28em; font-size:1.1em; color: var(--ink);">
+            Una nueva forma de hacer política: estratégica, predictiva y profundamente humana.
+          </p>
+        </div>
+
+        <div class="hero-foot">
+          <div class="brand">Presentación institucional</div>
+          <div class="brand">Confidencial</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 2. INTRO QUOTE ========== -->
+    <section data-transition="fade">
+      <div class="bg" style="background-image: url('assets/datacenter.png');"></div>
+      <div class="veil center"></div>
+
+      <div style="height:100%; display:flex; flex-direction:column; justify-content:center; padding: 0 2em;">
+        <div class="eyebrow">Una premisa</div>
+        <h2 style="font-size:4em; max-width: 15em; line-height:1.04; margin: .2em 0 1em;">
+          La política dejó de ser <em>artesanal</em>.<br/>
+          <span style="color: var(--ink-2); font-style: italic;">Y todavía se gobierna como si no.</span>
+        </h2>
+        <div class="rule" style="max-width:60%;"></div>
+        <p style="max-width: 38em; font-size: 1.1em;">
+          El votante cambió. Los canales cambiaron. La velocidad de decisión cambió.
+          Lo único que sigue igual es la pregunta: <strong>¿cómo lo convenzo?</strong>
+          Hoy, la respuesta empieza por los datos.
+        </p>
+      </div>
+      <div class="pagefoot"><span>01 — Premisa</span><span class="sep"></span><span>Atlas Analytics</span></div>
+    </section>
+
+    <!-- ========== 3. CONTEXTO ========== -->
+    <section data-transition="slide">
+      <div class="bg" style="background-image: url('assets/globe-plexus.png');"></div>
+      <div class="veil right"></div>
+
+      <div style="max-width: 62%;">
+        <div class="eyebrow">Contexto</div>
+        <h2 style="margin-bottom:.2em;">El votante ya no cabe<br/>en una sola etiqueta.</h2>
+        <p class="kicker" style="margin-bottom: 1.4em;">Tres mutaciones reescribieron la lógica de toda campaña.</p>
+
+        <div class="grid g-3">
+          <div class="card tilt fragment fade-up">
+            <div class="num">01 · IDENTIDAD</div>
+            <h3>Heterogeneidad radical</h3>
+            <p>Valores, comportamiento digital y afinidades emocionales conviven en un mismo barrio, una misma cuadra. Las viejas categorías ya no agrupan.</p>
+          </div>
+          <div class="card tilt fragment fade-up">
+            <div class="num">02 · COMUNICACIÓN</div>
+            <h3>Fin del mensaje masivo</h3>
+            <p>Cada segmento prioriza temas distintos. El mismo spot que persuade a uno repele a otro. La masividad se volvió ruido.</p>
+          </div>
+          <div class="card tilt fragment fade-up">
+            <div class="num">03 · TERRITORIO</div>
+            <h3>Territorio informacional</h3>
+            <p>El distrito ya no es solo geografía: es conversación, percepción y velocidad. Quien no lee el territorio digital, no lo gobierna.</p>
+          </div>
+        </div>
+
+        <div class="rule" style="margin-top: 1.6em;"></div>
+        <p class="quote" style="font-size:1.35em; margin-top:.6em;">La política dejó de ser artesanal.</p>
+      </div>
+
+      <div class="pagefoot"><span>02 — Contexto</span><span class="sep"></span><span>03 / 13</span></div>
+    </section>
+
+    <!-- ========== 4. PROBLEMA ========== -->
+    <section data-transition="slide">
+      <div class="bg" style="background-image: url('assets/charts-tall.png');"></div>
+      <div class="veil right"></div>
+
+      <div class="grid g-2" style="grid-template-columns: .9fr 1.3fr; gap: 3em; align-items:flex-start;">
+        <div class="titleblock">
+          <div class="eyebrow">Diagnóstico</div>
+          <h2>El costo de seguir<br/>haciendo campaña<br/><em>como antes</em>.</h2>
+          <p class="lead" style="margin-top: 1em;">
+            Cinco patrones repetidos en cada equipo tradicional —y cinco lugares donde un competidor con datos ya está sacando ventaja.
+          </p>
+          <div class="pill" style="margin-top: 1.4em;">Auditoría diagnóstica</div>
+        </div>
+
+        <div>
+          <div class="bignum fragment fade-up">
+            <div class="n">01</div>
+            <div><div class="t">Decisiones por intuición.</div><div class="d">Hipótesis basadas en la experiencia de cuatro personas en una sala, no en la conducta real de 500 mil votantes.</div></div>
+          </div>
+          <div class="bignum fragment fade-up">
+            <div class="n">02</div>
+            <div><div class="t">Encuestas que llegan tarde.</div><div class="d">El humor electoral cambia en horas; los tracking llegan en semanas. Decidís sobre una foto que ya envejeció.</div></div>
+          </div>
+          <div class="bignum fragment fade-up">
+            <div class="n">03</div>
+            <div><div class="t">Mensajes genéricos.</div><div class="d">Un solo discurso para audiencias incompatibles. Lo que persuade al núcleo aleja al indeciso.</div></div>
+          </div>
+          <div class="bignum fragment fade-up">
+            <div class="n">04</div>
+            <div><div class="t">Desperdicio de recursos.</div><div class="d">Pauta, militancia y agenda volcadas donde es cómodo, no donde el voto se decide.</div></div>
+          </div>
+          <div class="bignum fragment fade-up">
+            <div class="n">05</div>
+            <div><div class="t">Lectura ciega del electorado.</div><div class="d">Sin segmentación real, ninguna estrategia es estrategia: es una apuesta.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="pagefoot"><span>03 — Diagnóstico</span><span class="sep"></span><span>04 / 13</span></div>
+    </section>
+
+    <!-- ========== 5. SOLUCION ========== -->
+    <section data-transition="convex">
+      <div class="bg" style="background-image: url('assets/charts-wide.png');"></div>
+      <div class="veil"></div>
+
+      <div class="eyebrow">Solución</div>
+      <h2>Inteligencia electoral aplicada:<br/>el nuevo paradigma <em>data-driven</em>.</h2>
+
+      <div class="grid g-3" style="margin-top: 1.6em;">
+        <div class="card tilt fragment fade-up">
+          <div class="num">DATOS → ESTRATEGIA</div>
+          <h3>La hipótesis se prueba.</h3>
+          <p>Cada decisión nace de evidencia: encuestas digitales, comportamiento real, cohortes históricas.</p>
+        </div>
+        <div class="card tilt fragment fade-up">
+          <div class="num">DATOS → MENSAJE</div>
+          <h3>Hablar al segmento.</h3>
+          <p>El contenido se construye desde el lenguaje, miedo y aspiración de quien escucha —no desde el discurso del candidato.</p>
+        </div>
+        <div class="card tilt fragment fade-up">
+          <div class="num">DATOS → TERRITORIO</div>
+          <h3>Recorrer lo que vale.</h3>
+          <p>La agenda del candidato y la militancia van donde el modelo identifica voto en disputa, no donde hay cámaras esperando.</p>
+        </div>
+      </div>
+
+      <div class="rule" style="margin-top: 1.4em;"></div>
+
+      <div class="grid g-4" style="margin-top: 1em;">
+        <div class="metric"><div class="v violet count" data-to="40" data-prefix="-" data-suffix="%">0%</div><span class="l">Costo por voto persuadido</span></div>
+        <div class="metric"><div class="v count" data-to="3" data-suffix="x">0x</div><span class="l">Velocidad de decisión</span></div>
+        <div class="metric"><div class="v violet count" data-to="24" data-suffix="/7">0/7</div><span class="l">Monitoreo del clima</span></div>
+        <div class="metric"><div class="v count" data-to="95" data-suffix="%">0%</div><span class="l">Precisión de segmentación</span></div>
+      </div>
+
+      <p class="kicker" style="margin-top: 1.2em; text-align:right;">— Dejamos de adivinar. Empezamos a saber.</p>
+      <div class="pagefoot"><span>04 — Solución</span><span class="sep"></span><span>05 / 13</span></div>
+    </section>
+
+    <!-- ========== 6. METODOLOGÍA ========== -->
+    <section data-transition="slide">
+      <div class="bg" style="background-image: url('assets/datacenter.png');"></div>
+      <div class="veil right"></div>
+
+      <div class="grid g-2" style="grid-template-columns: 1fr 1fr; gap:3em; align-items:center;">
+        <div>
+          <div class="eyebrow">Metodología</div>
+          <h2>Cinco capas que se leen <em>juntas</em>.</h2>
+          <p class="lead-sm" style="margin: .8em 0 1.4em;">
+            Ninguna capa aislada explica una elección. Las superponemos en un mismo modelo, y aparecen los patrones que ningún consultor humano puede sostener simultáneamente.
+          </p>
+          <ul class="ticks">
+            <li><strong>Territorial</strong> — radios censales, conmutación, vías de circulación.</li>
+            <li><strong>Demográfica</strong> — edad, género, hogar, nivel educativo y socioeconómico.</li>
+            <li><strong>Psicosocial</strong> — valores, miedos, aspiraciones, identidad cultural.</li>
+            <li><strong>Digital</strong> — conversación, sentimiento, influenciadores locales.</li>
+            <li><strong>Histórica electoral</strong> — series por mesa y volatilidad de cohorte.</li>
+          </ul>
+          <p style="font-family: var(--mono); font-size:.55em; letter-spacing:.25em; color: var(--muted); margin-top: 1em;">▸ hovereá las capas →</p>
+        </div>
+
+        <div>
+          <div class="layers">
+            <div class="layer l1">01 · Territorial</div>
+            <div class="layer l2">02 · Demográfica</div>
+            <div class="layer l3">03 · Psicosocial</div>
+            <div class="layer l4">04 · Digital</div>
+            <div class="layer l5">05 · Histórica electoral</div>
+          </div>
+          <p style="text-align:center; font-family: var(--mono); font-size:.55em; letter-spacing:.25em; color: var(--muted); margin-top: .8em;">SISTEMA INTEGRADO · 5 CAPAS</p>
+        </div>
+      </div>
+      <div class="pagefoot"><span>05 — Metodología</span><span class="sep"></span><span>06 / 13</span></div>
+    </section>
+
+    <!-- ========== 7. SEGMENTACIÓN ========== -->
+    <section data-transition="slide">
+      <div class="bg" style="background-image: url('assets/globe-holographic.png');"></div>
+      <div class="veil"></div>
+
+      <div class="eyebrow">Segmentación</div>
+      <h2 style="margin-bottom: .2em;">El electorado, leído como <em>cinco audiencias distintas</em>.</h2>
+      <p class="kicker" style="margin-bottom: 1em;">Cada segmento exige un mensaje, un canal y un timing propio. <span style="color: var(--ink-2);">— clickeá cada bloque para ver el detalle.</span></p>
+
+      <div class="grid g-5" style="gap:1em;">
+        <div class="seg">
+          <div class="seg-icon">◆</div>
+          <span class="seg-more">+</span>
+          <h3>Persuadibles estratégicos</h3>
+          <p>Movibles, decisivos en el margen. Aquí se gana la elección.</p>
+          <div class="seg-detail">
+            <p>Voto en disputa final. Sensibles a evidencia concreta de gestión, no a slogans. Reaccionan a comparación, no a polarización.</p>
+            <span class="pct">~18% del padrón · ROI mensaje alto</span>
+          </div>
+        </div>
+        <div class="seg">
+          <div class="seg-icon">▲</div>
+          <span class="seg-more">+</span>
+          <h3>Núcleo duro</h3>
+          <p>Base leal. Activación y militancia.</p>
+          <div class="seg-detail">
+            <p>No se persuade: se moviliza. Estrategia centrada en pertenencia, defensa de identidad y fiscalización.</p>
+            <span class="pct">~32% del padrón · Foco en piso electoral</span>
+          </div>
+        </div>
+        <div class="seg">
+          <div class="seg-icon">●</div>
+          <span class="seg-more">+</span>
+          <h3>Indecisos volátiles</h3>
+          <p>Deciden en última semana.</p>
+          <div class="seg-detail">
+            <p>Cambian de opinión por noticia, clima emocional o último mensaje recibido. Premium en los 21 días finales.</p>
+            <span class="pct">~14% del padrón · Última milla decisiva</span>
+          </div>
+        </div>
+        <div class="seg">
+          <div class="seg-icon">○</div>
+          <span class="seg-more">+</span>
+          <h3>Abstencionistas recuperables</h3>
+          <p>No votan, pero podrían.</p>
+          <div class="seg-detail">
+            <p>Afines ideológicamente pero desconectados. Voto barato si se activa; activación territorial + identidad.</p>
+            <span class="pct">~9% del padrón · Voto incremental</span>
+          </div>
+        </div>
+        <div class="seg">
+          <div class="seg-icon">◉</div>
+          <span class="seg-more">+</span>
+          <h3>Microcomunidades locales</h3>
+          <p>Identidades específicas.</p>
+          <div class="seg-detail">
+            <p>Profesionales, padres, comerciantes, jubilados activos, primer voto. Cada uno responde a un código propio.</p>
+            <span class="pct">Estructura transversal · Multiplicador</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule" style="margin: 1.4em 0 1em;"></div>
+      <div class="chips">
+        <div class="chip">Profesionales</div>
+        <div class="chip">Padres</div>
+        <div class="chip">Emprendedores</div>
+        <div class="chip g">Primer voto</div>
+        <div class="chip g">Jubilados activos</div>
+        <div class="chip">Trabajadores informales</div>
+        <div class="chip">Comerciantes</div>
+      </div>
+
+      <div class="pagefoot"><span>06 — Segmentación</span><span class="sep"></span><span>07 / 13</span></div>
+    </section>
+
+    <!-- ========== 8. TERRITORIO ========== -->
+    <section data-transition="slide">
+      <div class="bg" style="background-image: url('assets/world-map.png');"></div>
+      <div class="veil left"></div>
+
+      <div class="grid g-2" style="grid-template-columns: 1.1fr 1fr; gap: 2.4em; align-items:center;">
+        <div>
+          <div class="eyebrow">Territorio</div>
+          <h2>Mapa de calor electoral<br/>—por distrito, por sección.</h2>
+          <p class="lead-sm" style="margin: .8em 0 1em;">
+            Cada celda es una unidad geográfica con su perfil propio. El modelo identifica dónde el voto está consolidado, dónde se disputa y dónde se está perdiendo terreno.
+          </p>
+
+          <div class="grid g-3" style="gap: .8em; margin-top: 1em;">
+            <div>
+              <div class="pill violet" style="margin-bottom: .6em;">Zonas fuertes</div>
+              <p style="font-size:.75em; margin:0;">Movilización del núcleo, fiscalización y voto efectivo.</p>
+            </div>
+            <div>
+              <div class="pill gold" style="margin-bottom: .6em;">Zonas disputadas</div>
+              <p style="font-size:.75em; margin:0;">Concentración del esfuerzo persuasivo: agenda, pauta y militancia.</p>
+            </div>
+            <div>
+              <div class="pill" style="margin-bottom: .6em;">Zonas débiles</div>
+              <p style="font-size:.75em; margin:0;">Contención táctica, no inversión profunda.</p>
+            </div>
+          </div>
+
+          <div class="rule" style="margin: 1.4em 0 1em;"></div>
+          <p style="font-size:.85em; color: var(--ink-2);">
+            <strong>Caso aplicado.</strong> Un equipo de campaña usó el mapa para planificar 30 días de recorrido del candidato. Resultado: <em>+18% en intención de voto en zonas prioritarias.</em>
+          </p>
+        </div>
+
+        <div>
+          <div class="heatmap" id="heatmap"></div>
+          <div class="hstack" style="margin-top: .9em; justify-content:space-between; font-family: var(--mono); font-size:.5em; letter-spacing:.25em; color: var(--muted); text-transform:uppercase;">
+            <span>Baja densidad</span>
+            <span>▸ hover sobre celdas</span>
+            <span>Alta densidad de voto en disputa</span>
+          </div>
+        </div>
+      </div>
+      <div class="pagefoot"><span>07 — Territorio</span><span class="sep"></span><span>08 / 13</span></div>
+    </section>
+
+    <!-- ========== 9. MENSAJERÍA ========== -->
+    <section data-transition="slide">
+      <div class="bg" style="background-image: url('assets/plexus-abstract.png');"></div>
+      <div class="veil right"></div>
+
+      <div class="eyebrow">Mensajería</div>
+      <h2>El mensaje correcto, a la persona correcta,<br/>por el <em>canal</em> correcto, en el <em>momento</em> correcto.</h2>
+
+      <div class="matrix" style="margin-top: 1.4em;">
+        <div class="head">Segmento</div>
+        <div class="head">Qué decir</div>
+        <div class="head">Canal</div>
+        <div class="head">Momento</div>
+
+        <div class="row-h">Persuadibles</div>
+        <div>Comparación de propuestas, gestión.</div>
+        <div>WhatsApp segmentado · Reels.</div>
+        <div>Últimos 21 días.</div>
+
+        <div class="row-h">Núcleo duro</div>
+        <div>Identidad, pertenencia, defensa.</div>
+        <div>Grupos cerrados · Telegram.</div>
+        <div>Toda la campaña.</div>
+
+        <div class="row-h">Indecisos</div>
+        <div>Emoción + cierre concreto.</div>
+        <div>YouTube · TikTok · TV digital.</div>
+        <div>Última semana.</div>
+
+        <div class="row-h">Abstencionistas</div>
+        <div>Por qué importa tu voto.</div>
+        <div>Door-to-door · SMS · Stories.</div>
+        <div>72 hs previas.</div>
+      </div>
+
+      <div class="grid g-3" style="margin-top: 1.4em; gap: 1em;">
+        <div class="card tilt"><div class="num">A · TESTING</div><h3 style="font-size:1.15em;">A/B en producción</h3><p>Cada variante se mide en mercado, no en focus group.</p></div>
+        <div class="card tilt"><div class="num">B · EMOCIÓN</div><h3 style="font-size:1.15em;">Análisis emocional</h3><p>Tono, valencia y tema dominante por audiencia y momento.</p></div>
+        <div class="card tilt"><div class="num">C · LOOP</div><h3 style="font-size:1.15em;">Optimización continua</h3><p>Lo que funciona escala. Lo que no, se descarta.</p></div>
+      </div>
+      <div class="pagefoot"><span>08 — Mensajería</span><span class="sep"></span><span>09 / 13</span></div>
+    </section>
+
+    <!-- ========== 10. APLICACIONES ========== -->
+    <section data-transition="slide">
+      <div class="bg" style="background-image: url('assets/charts-wide.png');"></div>
+      <div class="veil"></div>
+
+      <div class="eyebrow">Aplicaciones</div>
+      <h2>De la tabla al terreno:<br/><em>impacto medible</em>, no consultoría abstracta.</h2>
+
+      <div class="grid g-5" style="margin-top: 2em; gap:1.4em;">
+        <div class="metric">
+          <div class="v count" data-to="45" data-prefix="+" data-suffix="%">+0%</div>
+          <span class="l">Agenda del candidato</span>
+          <p class="s">Optimización del tiempo en zonas con voto en disputa.</p>
+        </div>
+        <div class="metric">
+          <div class="v violet count" data-to="60" data-prefix="+" data-suffix="%">+0%</div>
+          <span class="l">Militancia territorial</span>
+          <p class="s">Coordinación basada en prioridad real, no en intuición local.</p>
+        </div>
+        <div class="metric">
+          <div class="v count" data-to="120" data-prefix="+" data-suffix="%">+0%</div>
+          <span class="l">Contenido digital</span>
+          <p class="s">Engagement útil sobre audiencias correctamente segmentadas.</p>
+        </div>
+        <div class="metric">
+          <div class="v violet count" data-to="75" data-prefix="-" data-suffix="%">-0%</div>
+          <span class="l">Tiempo de ajuste</span>
+          <p class="s">De la lectura de campo a la corrección de estrategia.</p>
+        </div>
+        <div class="metric">
+          <div class="v count" data-to="65" data-prefix="-" data-suffix="%">-0%</div>
+          <span class="l">Errores evitados</span>
+          <p class="s">Crisis predichas antes de que escalen.</p>
+        </div>
+      </div>
+
+      <div class="rule" style="margin-top: 2em;"></div>
+      <p style="font-family: var(--serif); font-style: italic; font-size: 1.5em; color: var(--ink); text-align:center; margin-top:.4em;">
+        Lo que antes tardaba <strong>semanas</strong>, ahora ocurre en <strong>horas</strong>.
+      </p>
+
+      <div class="pagefoot"><span>09 — Aplicaciones</span><span class="sep"></span><span>10 / 13</span></div>
+    </section>
+
+    <!-- ========== 11. BENEFICIOS ========== -->
+    <section data-transition="convex">
+      <div class="bg" style="background-image: url('assets/charts-tall.png');"></div>
+      <div class="veil right"></div>
+
+      <div class="eyebrow">Ventaja competitiva</div>
+      <h2>Menos gasto. Más impacto.<br/><em>Menos riesgo, mejor resultado.</em></h2>
+
+      <div class="grid g-2" style="margin-top: 1.6em; gap: 2.4em;">
+        <div class="stack">
+          <div>
+            <div class="metric"><div class="v count" data-to="40" data-prefix="-" data-suffix="%" style="font-size:2.8em;">-0%</div><span class="l">Costo total de campaña</span></div>
+            <div class="bar" style="--w:60%; margin-top:.6em;"><span></span></div>
+          </div>
+          <div>
+            <div class="metric"><div class="v violet count" data-to="3" data-suffix="x" style="font-size:2.8em;">0x</div><span class="l">Velocidad de decisión</span></div>
+            <div class="bar" style="--w:78%; margin-top:.6em;"><span></span></div>
+          </div>
+          <div>
+            <div class="metric"><div class="v count" data-to="75" data-prefix="-" data-suffix="%" style="font-size:2.8em;">-0%</div><span class="l">Respuesta a crisis</span></div>
+            <div class="bar" style="--w:82%; margin-top:.6em;"><span></span></div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="target">
+            <h4>Anticipación de escenarios</h4>
+            <p>Detectamos el cambio en la conversación pública antes de que llegue al titular del diario.</p>
+          </div>
+          <div class="target">
+            <h4>Profesionalización total</h4>
+            <p>Reemplazamos la corazonada por un proceso auditable, replicable y mejorable.</p>
+          </div>
+          <div class="target">
+            <h4>Reducción del riesgo</h4>
+            <p>Cada decisión queda documentada con su evidencia. Si algo cambia, se sabe por qué.</p>
+          </div>
+          <div class="target">
+            <h4>Continuidad post-elección</h4>
+            <p>La inteligencia electoral se transforma en inteligencia de gestión el día después.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pagefoot"><span>10 — Beneficios</span><span class="sep"></span><span>11 / 13</span></div>
+    </section>
+
+    <!-- ========== 12. CLIENTES ========== -->
+    <section data-transition="slide">
+      <div class="bg" style="background-image: url('assets/globe-plexus.png');"></div>
+      <div class="veil left"></div>
+
+      <div class="grid g-2" style="grid-template-columns: 1fr 1.4fr; gap: 3em; align-items:center;">
+        <div>
+          <div class="eyebrow">Para quién</div>
+          <h2>Atlas Analytics<br/>trabaja con quienes <em>compiten en serio</em>.</h2>
+          <p class="lead-sm" style="margin-top:.8em;">No vendemos dashboards. Operamos al lado del equipo de campaña, con responsabilidad sobre el resultado.</p>
+          <div class="rule"></div>
+          <p style="font-family: var(--mono); font-size: .55em; letter-spacing:.32em; color: var(--violet-2); text-transform:uppercase;">Engagement típico: 4–9 meses</p>
+        </div>
+
+        <div class="stack">
+          <div class="card tilt fragment fade-up">
+            <div class="num">A · CANDIDATOS</div>
+            <h3 style="font-size:1.4em;">Candidatos en disputa real.</h3>
+            <p>Postulaciones donde 2–5 puntos definen la elección. Ahí los datos pagan.</p>
+          </div>
+          <div class="card tilt fragment fade-up">
+            <div class="num">B · JEFES DE CAMPAÑA</div>
+            <h3 style="font-size:1.4em;">Jefes de campaña profesionales.</h3>
+            <p>Equipos que ya operan con disciplina y necesitan amplificar su lectura del terreno.</p>
+          </div>
+          <div class="card tilt fragment fade-up">
+            <div class="num">C · GOBIERNOS</div>
+            <h3 style="font-size:1.4em;">Gobiernos en reelección.</h3>
+            <p>Necesitan medir gestión, anticipar reclamos y proteger la base que los eligió.</p>
+          </div>
+          <div class="card tilt fragment fade-up">
+            <div class="num">D · ESPACIOS · CONSULTORES</div>
+            <h3 style="font-size:1.4em;">Espacios en crecimiento y consultores estratégicos.</h3>
+            <p>Aliados que multiplican el alcance del análisis cuando la operación lo requiere.</p>
+          </div>
+        </div>
+      </div>
+      <div class="pagefoot"><span>11 — Clientes</span><span class="sep"></span><span>12 / 13</span></div>
+    </section>
+
+    <!-- ========== 13. CIERRE ========== -->
+    <section data-transition="fade">
+      <div class="bg" style="background-image: url('assets/logo-globe.png'); background-position: center;"></div>
+      <div class="veil center"></div>
+
+      <div class="closing">
+        <div class="mono">ATLAS · ANALYTICS</div>
+        <h1>La política sigue siendo <span class="em">humana</span>.<br/>Pero hoy, gana quien <span class="em">domina los datos</span>.</h1>
+        <p style="max-width: 32em; font-size: 1.1em; margin-top: 1em;">
+          Empezamos con una <strong>evaluación gratuita</strong> de tu escenario electoral.<br/>
+          Un diagnóstico de 7 días, sin compromiso, con tu equipo y tus números.
+        </p>
+        <a class="cta" href="mailto:contacto@atlasanalytics.ar"><span class="dot"></span> Solicitar evaluación gratuita</a>
+        <div style="margin-top: 2.6em; font-family: var(--mono); font-size: .55em; letter-spacing:.32em; color: var(--muted);">
+          atlasanalytics.ar · contacto@atlasanalytics.ar
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true, controls: true, progress: true, center: false,
+    slideNumber: 'c/t', transition: 'slide', transitionSpeed: 'default',
+    backgroundTransition: 'fade',
+    width: 1440, height: 900, margin: 0.05,
+    pdfSeparateFragments: false, pdfMaxPagesPerSlide: 1,
+  });
+
+  // ---- Heatmap procedural with hover tooltip via title ----
+  (function(){
+    var el = document.getElementById('heatmap'); if(!el) return;
+    var W=14, H=9, cells=[];
+    var zonas = ['Centro', 'Norte', 'Sur', 'Oeste', 'Este', 'Cordón A', 'Cordón B', 'Periurbano'];
+    for(var i=0;i<W*H;i++){
+      var r = Math.random();
+      var cls = '';
+      var pct = Math.round(r*100);
+      if(r > 0.92) cls='h5';
+      else if(r > 0.82) cls='h4';
+      else if(r > 0.65) cls='h3';
+      else if(r > 0.40) cls='h2';
+      else if(r > 0.20) cls='h1';
+      var z = zonas[Math.floor(Math.random()*zonas.length)];
+      cells.push('<div class="cell '+cls+'" title="'+z+' · intensidad '+pct+'%"></div>');
+    }
+    el.innerHTML = cells.join('');
+  })();
+
+  // ---- Cursor parallax on background image (per slide) ----
+  document.addEventListener('mousemove', function(e){
+    var x = (e.clientX / window.innerWidth - 0.5) * 2;
+    var y = (e.clientY / window.innerHeight - 0.5) * 2;
+    document.querySelectorAll('section.present .bg').forEach(function(b){
+      b.style.setProperty('--kx', (x*1.5)+'%');
+      b.style.setProperty('--ky', (y*1.5)+'%');
+    });
+    document.querySelectorAll('section.present .veil').forEach(function(v){
+      v.style.setProperty('--vx', ((e.clientX/window.innerWidth)*100)+'%');
+      v.style.setProperty('--vy', ((e.clientY/window.innerHeight)*100)+'%');
+    });
+  });
+
+  // ---- Card cursor spotlight + 3D tilt ----
+  document.querySelectorAll('.card').forEach(function(c){
+    c.addEventListener('mousemove', function(e){
+      var r = c.getBoundingClientRect();
+      var mx = (e.clientX - r.left)/r.width;
+      var my = (e.clientY - r.top)/r.height;
+      c.style.setProperty('--mx', (mx*100)+'%');
+      c.style.setProperty('--my', (my*100)+'%');
+      if(c.classList.contains('tilt')){
+        var rx = (my - .5) * -8;
+        var ry = (mx - .5) * 10;
+        c.style.transform = 'perspective(900px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateY(-3px)';
+      }
+    });
+    c.addEventListener('mouseleave', function(){
+      if(c.classList.contains('tilt')) c.style.transform='';
+    });
+  });
+
+  // ---- Animated counters when slide becomes current ----
+  function animateCount(el){
+    if(el.dataset.done) return;
+    var to = parseFloat(el.dataset.to||0);
+    var suf = el.dataset.suffix||'';
+    var pre = el.dataset.prefix||'';
+    var dur = 1400, start = performance.now();
+    var step = function(t){
+      var p = Math.min(1, (t-start)/dur);
+      var e = 1 - Math.pow(1-p, 3);
+      var v = Math.round(to*e);
+      el.textContent = pre + v + suf;
+      if(p<1) requestAnimationFrame(step);
+      else el.dataset.done = '1';
+    };
+    requestAnimationFrame(step);
+  }
+  Reveal.on('slidechanged', function(e){
+    e.currentSlide.querySelectorAll('.count').forEach(function(el){
+      el.dataset.done = '';
+      animateCount(el);
+    });
+  });
+  // Initial slide too
+  setTimeout(function(){
+    var cur = Reveal.getCurrentSlide();
+    if(cur) cur.querySelectorAll('.count').forEach(animateCount);
+  }, 200);
+
+  // ---- Interactive segment cards (click to expand) ----
+  document.querySelectorAll('.seg').forEach(function(s){
+    s.addEventListener('click', function(){
+      var wasOpen = s.classList.contains('open');
+      s.parentElement.querySelectorAll('.seg.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.seg-more').textContent='+'; });
+      if(!wasOpen){ s.classList.add('open'); s.querySelector('.seg-more').textContent='—'; }
+    });
+  });
+
+  // ---- Live ticker on cover ----
+  (function(){
+    var conv = document.getElementById('ticker-conv');
+    var sig  = document.getElementById('ticker-sig');
+    if(!conv || !sig) return;
+    var c = 1247318, sg = 38402;
+    setInterval(function(){
+      c += Math.floor(Math.random()*40+10);
+      sg += Math.floor(Math.random()*8);
+      conv.textContent = c.toLocaleString('es-AR');
+      sig.textContent  = sg.toLocaleString('es-AR');
+    }, 900);
+  })();
+</script>
+</body>
+</html>
