@@ -43,9 +43,10 @@
   /* Persistent atmospheric grain layer */
   body::after{
     content:""; position:fixed; inset:0; z-index: 5; pointer-events:none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .12 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    opacity:.35; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity:.5;
   }
+  @media (prefers-reduced-motion: reduce){ body::after{ display:none; } }
 
   .reveal { font-family: var(--sans); color: var(--ink); }
   .reveal .slides { text-align: left; }
@@ -55,16 +56,18 @@
   .bg{
     position:absolute; inset:0; z-index:-2; overflow:hidden;
     background-position:center; background-size:cover;
-    transform: scale(1.08);
+    transform: scale(1.08) translate3d(0,0,0);
     transition: transform 14s ease-out;
     filter: saturate(1.1) contrast(1.05);
+    will-change: transform;
   }
-  section.present .bg{ transform: scale(1.18) translate(var(--kx,1%), var(--ky,-1%)); }
+  section.present .bg{ transform: scale(1.18) translate3d(0,0,0); }
   /* darken overlay for readability */
   .veil{
-    position:absolute; inset:0; z-index:-1; pointer-events:none;
+    position:absolute; inset:-8%; z-index:-1; pointer-events:none;
+    will-change: transform;
     background:
-      radial-gradient(900px 600px at var(--vx,30%) var(--vy,40%), rgba(167,139,250,.18), transparent 65%),
+      radial-gradient(900px 600px at 30% 40%, rgba(167,139,250,.18), transparent 65%),
       linear-gradient(180deg, rgba(6,5,13,.65) 0%, rgba(6,5,13,.55) 40%, rgba(6,5,13,.85) 100%),
       linear-gradient(90deg, rgba(6,5,13,.7) 0%, rgba(6,5,13,.15) 50%, rgba(6,5,13,.7) 100%);
   }
@@ -126,8 +129,8 @@
     border: 1px solid var(--line);
     border-radius: 16px;
     padding: 1.4em 1.3em;
-    backdrop-filter: blur(14px) saturate(1.4);
-    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(8px) saturate(1.4);
+    -webkit-backdrop-filter: blur(8px) saturate(1.4);
     transition: transform .4s cubic-bezier(.2,.7,.2,1), border-color .4s, box-shadow .4s, background .4s;
     overflow:hidden;
     transform-style: preserve-3d;
@@ -224,12 +227,14 @@
   /* ===== BARS ===== */
   .bar{ position:relative; height:6px; border-radius:999px; background: rgba(255,255,255,.08); overflow:hidden; }
   .bar > span{
-    position:absolute; left:0; top:0; bottom:0;
+    position:absolute; left:0; top:0; bottom:0; width: 100%;
     background: linear-gradient(90deg, var(--violet), var(--gold));
-    width: 0%; transition: width 2s cubic-bezier(.2,.8,.2,1);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform 2s cubic-bezier(.2,.8,.2,1);
     box-shadow: 0 0 18px var(--violet-glow);
+    will-change: transform;
   }
-  .reveal .present .bar > span{ width: var(--w, 60%); }
+  .reveal .present .bar > span{ transform: scaleX(var(--w, .6)); }
 
   /* ===== FOOTER ===== */
   .pagefoot{
@@ -314,7 +319,7 @@
     display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap:0;
     border:1px solid var(--line); border-radius: 14px; overflow:hidden;
     background: rgba(0,0,0,.55);
-    backdrop-filter: blur(14px);
+    backdrop-filter: blur(8px);
   }
   .matrix > div{
     padding: 1em 1.2em; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
@@ -353,7 +358,7 @@
     background: linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.015));
     border: 1px solid var(--line);
     border-radius: 16px; padding: 1.3em 1.2em;
-    backdrop-filter: blur(14px);
+    backdrop-filter: blur(8px);
     transition: all .4s cubic-bezier(.2,.7,.2,1);
     overflow: hidden;
   }
@@ -383,23 +388,17 @@
   }
   .seg.open .seg-more{ color: var(--gold-2); border-color: rgba(212,175,55,.6); background: rgba(212,175,55,.08); }
 
-  /* ===== HOTSPOT (clickable dot on map) ===== */
-  .hotspot{
-    position:absolute; width: 14px; height: 14px; border-radius: 50%;
-    background: var(--gold); box-shadow: 0 0 0 0 var(--gold);
-    cursor:pointer; transform: translate(-50%,-50%);
-    animation: ring 2.4s ease-out infinite;
-  }
-  @keyframes ring{
-    0%{ box-shadow: 0 0 0 0 rgba(212,175,55,.7); }
-    100%{ box-shadow: 0 0 0 28px rgba(212,175,55,0); }
-  }
-
   /* ===== COVER STAGE (rotating planet + static logo) ===== */
   .cover-stage{
     position:absolute; top: 50%; right: 4%; transform: translateY(-50%);
     width: clamp(420px, 42vw, 700px); aspect-ratio: 1/1;
     z-index: 0; pointer-events: none;
+  }
+  /* Static halo behind the planet (no filter cost) */
+  .cover-stage::before{
+    content:""; position:absolute; inset: -8%; border-radius:50%;
+    background: radial-gradient(circle at center, rgba(167,139,250,.45) 0%, rgba(139,92,246,.18) 35%, transparent 65%);
+    z-index: -1;
   }
 
   /* Rotating planet — circular mask, behind everything */
@@ -409,10 +408,11 @@
     background-size: 180% 180%;
     background-position: center;
     animation: spinPlanet 45s linear infinite;
-    filter: hue-rotate(-5deg) saturate(1.25) brightness(1.05) drop-shadow(0 0 80px rgba(167,139,250,.8));
+    filter: hue-rotate(-5deg) saturate(1.25) brightness(1.05);
     mask-image: radial-gradient(circle at center, black 58%, transparent 78%);
     -webkit-mask-image: radial-gradient(circle at center, black 58%, transparent 78%);
     opacity: .85;
+    will-change: transform;
   }
   /* Inner core glow that pulses */
   .planet-core{
@@ -465,13 +465,19 @@
     display:flex; align-items:center; justify-content:center;
     perspective: 1400px;
   }
+  /* Static glow behind the rotating network */
+  .nn-stage::before{
+    content:""; position:absolute; inset: 8% -4% 8% 14%;
+    background: radial-gradient(ellipse at center, rgba(139,92,246,.32) 0%, rgba(139,92,246,.1) 35%, transparent 65%);
+    z-index: -1; pointer-events:none;
+  }
   .nn-svg{
     width: 100%; height: 100%;
     overflow: visible;
-    filter: drop-shadow(0 0 80px rgba(139,92,246,.5));
     transform: rotateY(-16deg) rotateX(4deg);
     transform-style: preserve-3d;
     animation: nnFloat 18s ease-in-out infinite;
+    will-change: transform;
   }
   @keyframes nnFloat{
     0%, 100% { transform: rotateY(-18deg) rotateX(5deg) translateY(0); }
@@ -492,6 +498,9 @@
   .nn-svg .nn-node-io{
     filter: drop-shadow(0 0 14px rgba(244,210,138,.9));
   }
+  .nn-svg .nn-signals{
+    filter: drop-shadow(0 0 6px rgba(244,210,138,.85));
+  }
   .nn-svg .nn-signal{
     stroke: #f4d28a;
     stroke-width: 1.8;
@@ -499,7 +508,6 @@
     stroke-linecap: round;
     stroke-dasharray: 28 1600;
     stroke-dashoffset: 1628;
-    filter: drop-shadow(0 0 8px rgba(244,210,138,.95));
     animation: nnSignal 2.6s linear infinite;
   }
   @keyframes nnSignal{ to { stroke-dashoffset: 0; } }
@@ -895,7 +903,7 @@
         </div>
 
         <div>
-          <div style="background: rgba(0,0,0,.5); border:1px solid var(--line); border-radius: 16px; padding: 2em 1.8em; backdrop-filter: blur(14px);">
+          <div style="background: rgba(0,0,0,.5); border:1px solid var(--line); border-radius: 16px; padding: 2em 1.8em; backdrop-filter: blur(8px);">
             <div style="font-family: var(--mono); font-size:.5em; letter-spacing:.32em; text-transform:uppercase; color: var(--violet-2); margin-bottom: 1.4em;">▸ Distribución del territorio</div>
 
             <div style="padding: 1.1em 0; border-top: 1px solid var(--line);">
@@ -903,7 +911,7 @@
                 <span style="font-family: var(--serif); font-style: italic; font-size: 1.4em; color: var(--ink);">Zonas fuertes</span>
                 <span style="font-family: var(--serif); font-size: 2em; font-weight:500; background: linear-gradient(180deg,#fff,var(--violet-2)); -webkit-background-clip:text; background-clip:text; color:transparent;">42<span style="font-size:.6em;">%</span></span>
               </div>
-              <div class="bar" style="--w: 42%;"><span></span></div>
+              <div class="bar" style="--w: .42;"><span></span></div>
               <p style="font-size:.7em; color: var(--ink-2); margin: .5em 0 0;">Núcleo consolidado · prioridad de fiscalización y movilización.</p>
             </div>
 
@@ -912,7 +920,7 @@
                 <span style="font-family: var(--serif); font-style: italic; font-size: 1.4em; color: var(--gold-2);">Zonas disputadas</span>
                 <span style="font-family: var(--serif); font-size: 2em; font-weight:500; background: linear-gradient(180deg,#fff,var(--gold-2),var(--gold)); -webkit-background-clip:text; background-clip:text; color:transparent;">31<span style="font-size:.6em;">%</span></span>
               </div>
-              <div class="bar" style="--w: 31%;"><span></span></div>
+              <div class="bar" style="--w: .31;"><span></span></div>
               <p style="font-size:.7em; color: var(--ink-2); margin: .5em 0 0;">Donde se decide la elección · foco persuasivo total.</p>
             </div>
 
@@ -921,7 +929,7 @@
                 <span style="font-family: var(--serif); font-style: italic; font-size: 1.4em; color: var(--ink-2);">Zonas débiles</span>
                 <span style="font-family: var(--serif); font-size: 2em; font-weight:500; color: var(--ink-2);">27<span style="font-size:.6em;">%</span></span>
               </div>
-              <div class="bar" style="--w: 27%;"><span></span></div>
+              <div class="bar" style="--w: .27;"><span></span></div>
               <p style="font-size:.7em; color: var(--ink-2); margin: .5em 0 0;">Contención táctica · sin inversión profunda.</p>
             </div>
 
@@ -1034,15 +1042,15 @@
         <div class="stack">
           <div>
             <div class="metric"><div class="v count" data-to="40" data-prefix="-" data-suffix="%" style="font-size:2.8em;">-0%</div><span class="l">Costo total de campaña</span></div>
-            <div class="bar" style="--w:60%; margin-top:.6em;"><span></span></div>
+            <div class="bar" style="--w:.6; margin-top:.6em;"><span></span></div>
           </div>
           <div>
             <div class="metric"><div class="v violet count" data-to="3" data-suffix="x" style="font-size:2.8em;">0x</div><span class="l">Velocidad de decisión</span></div>
-            <div class="bar" style="--w:78%; margin-top:.6em;"><span></span></div>
+            <div class="bar" style="--w:.78; margin-top:.6em;"><span></span></div>
           </div>
           <div>
             <div class="metric"><div class="v count" data-to="75" data-prefix="-" data-suffix="%" style="font-size:2.8em;">-0%</div><span class="l">Respuesta a crisis</span></div>
-            <div class="bar" style="--w:82%; margin-top:.6em;"><span></span></div>
+            <div class="bar" style="--w:.82; margin-top:.6em;"><span></span></div>
           </div>
         </div>
 
@@ -1155,38 +1163,60 @@
     }, 120);
   });
 
-  // ---- Cursor parallax on background image (per slide) ----
+  // ---- Cursor parallax (rAF-throttled, cached refs, no CSS-var paint) ----
+  var _veils = [], _mx = 0, _my = 0, _mqueued = false;
+  function refreshActiveRefs(){
+    _veils = Array.prototype.slice.call(document.querySelectorAll('section.present .veil'));
+  }
+  function applyParallax(){
+    _mqueued = false;
+    var x = (_mx / window.innerWidth - 0.5) * 2;
+    var y = (_my / window.innerHeight - 0.5) * 2;
+    // Veil glow follows cursor — paint-heavy if we changed gradient origin,
+    // so we shift it via cheap composite transform instead.
+    var tx = (x * 60).toFixed(1) + 'px';
+    var ty = (y * 60).toFixed(1) + 'px';
+    for(var i=0;i<_veils.length;i++){
+      _veils[i].style.transform = 'translate3d(' + tx + ',' + ty + ',0)';
+    }
+  }
   document.addEventListener('mousemove', function(e){
-    var x = (e.clientX / window.innerWidth - 0.5) * 2;
-    var y = (e.clientY / window.innerHeight - 0.5) * 2;
-    document.querySelectorAll('section.present .bg').forEach(function(b){
-      b.style.setProperty('--kx', (x*1.5)+'%');
-      b.style.setProperty('--ky', (y*1.5)+'%');
-    });
-    document.querySelectorAll('section.present .veil').forEach(function(v){
-      v.style.setProperty('--vx', ((e.clientX/window.innerWidth)*100)+'%');
-      v.style.setProperty('--vy', ((e.clientY/window.innerHeight)*100)+'%');
-    });
-  });
+    _mx = e.clientX; _my = e.clientY;
+    if(!_mqueued){ _mqueued = true; requestAnimationFrame(applyParallax); }
+  }, { passive: true });
+  Reveal.on('slidechanged', refreshActiveRefs);
+  setTimeout(refreshActiveRefs, 100);
 
-  // ---- Card cursor spotlight + 3D tilt ----
+  // ---- Card cursor spotlight + 3D tilt (cached rect, rAF) ----
   document.querySelectorAll('.card').forEach(function(c){
-    c.addEventListener('mousemove', function(e){
-      var r = c.getBoundingClientRect();
-      var mx = (e.clientX - r.left)/r.width;
-      var my = (e.clientY - r.top)/r.height;
-      c.style.setProperty('--mx', (mx*100)+'%');
-      c.style.setProperty('--my', (my*100)+'%');
+    var rect = null, queued = false, lx = 0, ly = 0;
+    function apply(){
+      queued = false;
+      if(!rect) return;
+      var mx = (lx - rect.left) / rect.width;
+      var my = (ly - rect.top)  / rect.height;
+      c.style.setProperty('--mx', (mx*100).toFixed(1)+'%');
+      c.style.setProperty('--my', (my*100).toFixed(1)+'%');
       if(c.classList.contains('tilt')){
         var rx = (my - .5) * -8;
-        var ry = (mx - .5) * 10;
-        c.style.transform = 'perspective(900px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateY(-3px)';
+        var ry = (mx - .5) *  10;
+        c.style.transform = 'perspective(900px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) translateY(-3px)';
       }
-    });
+    }
+    c.addEventListener('mouseenter', function(){ rect = c.getBoundingClientRect(); });
+    c.addEventListener('mousemove', function(e){
+      lx = e.clientX; ly = e.clientY;
+      if(!queued){ queued = true; requestAnimationFrame(apply); }
+    }, { passive: true });
     c.addEventListener('mouseleave', function(){
-      if(c.classList.contains('tilt')) c.style.transform='';
+      rect = null;
+      if(c.classList.contains('tilt')) c.style.transform = '';
     });
   });
+  // Invalidate cached rects on resize
+  window.addEventListener('resize', function(){
+    document.querySelectorAll('.card').forEach(function(c){ c._rect = null; });
+  }, { passive: true });
 
   // ---- Animated counters when slide becomes current ----
   function fmt(n){
